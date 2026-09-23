@@ -7,7 +7,11 @@ def push_to_medium(title, body):
     print("Starting headless browser to publish to Medium...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True) 
-        context = browser.new_context()
+        
+        # 1. Disguise the bot as a normal Windows Chrome browser to bypass security blocks
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
         
         cookie_data = os.environ.get("MEDIUM_COOKIES")
         cookies = json.loads(cookie_data)
@@ -16,22 +20,25 @@ def push_to_medium(title, body):
         
         page = context.new_page()
         print("Navigating to editor...")
-        page.goto("https://medium.com/new-story", timeout=60000)
+        page.goto("https://medium.com/new-story", timeout=60000, wait_until="networkidle")
         
-        # Wait for Medium's editor textboxes to fully render
+        # 2. Strict Login Check: Did we actually make it to the editor?
+        print(f"Current URL: {page.url}")
+        if "new-story" not in page.url:
+            raise Exception("CRITICAL ERROR: Medium rejected the cookies and redirected us. Your session expired. You MUST export fresh cookies from your browser and update the MEDIUM_COOKIES secret in GitHub!")
+        
         print("Waiting for editor to load...")
-        page.wait_for_selector("role=textbox", timeout=15000)
+        # 3. Use the universal HTML attribute for rich-text editors
+        page.wait_for_selector("[contenteditable='true']", timeout=15000)
         
         print("Targeting the Title field...")
-        # explicitly click the first textbox (the Title)
-        editor = page.locator("role=textbox").first
+        editor = page.locator("[contenteditable='true']").first
         editor.click()
         
         print("Inserting Title...")
-        # insert_text injects the string safely without needing Ctrl+V
         page.keyboard.insert_text(title)
         page.keyboard.press("Enter")
-        time.sleep(1) # Give Medium a second to create the new paragraph block
+        time.sleep(2) 
         
         print("Inserting Body...")
         page.keyboard.insert_text(body)
