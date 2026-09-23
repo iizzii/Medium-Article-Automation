@@ -1,5 +1,6 @@
 from google import genai
 import os
+import time
 
 def generate_draft(topic):
     print("Generating article with Gemini...")
@@ -17,11 +18,23 @@ def generate_draft(topic):
     4. Add a brief disclosure at the very end stating AI assisted in drafting.
     """
     
-    # Updated to the new 3.6 model
-    response = client.models.generate_content(
-        model='gemini-3.6-flash',
-        contents=prompt
-    )
+    # Retry logic: Try up to 3 times if the server is busy
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model='gemini-3.6-flash',
+                contents=prompt
+            )
+            break # If successful, exit the retry loop
+        except Exception as e:
+            if "503" in str(e) or "429" in str(e):
+                print(f"Server busy. Retrying in 30 seconds... (Attempt {attempt + 1} of {max_retries})")
+                time.sleep(30)
+                if attempt == max_retries - 1:
+                    raise Exception("Failed after maximum retries.") from e
+            else:
+                raise e # If it's a different error, crash normally
     
     lines = response.text.strip().split('\n')
     title = lines[0].replace('#', '').replace('*', '').strip()
