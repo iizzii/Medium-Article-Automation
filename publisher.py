@@ -9,12 +9,14 @@ def push_to_medium(title, body):
         browser = p.chromium.launch(headless=True) 
         context = browser.new_context()
         
+        # FIX: Explicitly grant clipboard permissions to the headless browser
+        context.grant_permissions(["clipboard-read", "clipboard-write"])
+        
         cookie_data = os.environ.get("MEDIUM_COOKIES")
         if not cookie_data:
             raise ValueError("No MEDIUM_COOKIES found in environment!")
             
         cookies = json.loads(cookie_data)
-        # Filter and inject cookies
         valid_cookies = [{"name": c["name"], "value": c["value"], "domain": c["domain"], "path": c["path"]} for c in cookies]
         context.add_cookies(valid_cookies)
         
@@ -26,8 +28,10 @@ def push_to_medium(title, body):
         page.keyboard.type(title)
         page.keyboard.press("Enter")
         
-        # Fill Body using clipboard paste simulation to preserve markdown
-        page.evaluate(f"navigator.clipboard.writeText(`{body}`)")
+        # FIX: Safely pass the body text to the clipboard bypassing JS string limitations
+        page.evaluate("text => navigator.clipboard.writeText(text)", body)
+        
+        # Paste into Medium
         page.keyboard.down("Control")
         page.keyboard.press("v")
         page.keyboard.up("Control")
