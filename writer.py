@@ -1,9 +1,11 @@
-import google.generativeai as genai
+from google import genai
 import os
 
 def generate_draft(topic):
     print("Generating article with Gemini...")
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    
+    # The new SDK automatically picks up the GEMINI_API_KEY from environment variables
+    client = genai.Client()
     
     prompt = f"""
     You are a top Medium writer focusing on Indian corporate life and AI trends. 
@@ -16,8 +18,11 @@ def generate_draft(topic):
     4. Add a brief disclosure at the very end stating AI assisted in drafting.
     """
     
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(prompt)
+    # Using the current active model
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt
+    )
     
     lines = response.text.strip().split('\n')
     title = lines[0].replace('#', '').replace('*', '').strip()
