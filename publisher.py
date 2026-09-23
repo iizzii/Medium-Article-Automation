@@ -9,8 +9,6 @@ def push_to_medium(title, body):
         browser = p.chromium.launch(headless=True) 
         context = browser.new_context()
         
-        context.grant_permissions(["clipboard-read", "clipboard-write"])
-        
         cookie_data = os.environ.get("MEDIUM_COOKIES")
         cookies = json.loads(cookie_data)
         valid_cookies = [{"name": c["name"], "value": c["value"], "domain": c["domain"], "path": c["path"]} for c in cookies]
@@ -19,30 +17,27 @@ def push_to_medium(title, body):
         page = context.new_page()
         print("Navigating to editor...")
         page.goto("https://medium.com/new-story", timeout=60000)
-        time.sleep(5) 
         
-        # SAFETY CHECK 1: Did we actually log in?
-        print(f"Current URL: {page.url}")
-        if "new-story" not in page.url:
-            raise Exception("Login failed! Medium rejected the cookies. You may need to export fresh cookies from your browser.")
+        # Wait for Medium's editor textboxes to fully render
+        print("Waiting for editor to load...")
+        page.wait_for_selector("role=textbox", timeout=15000)
         
-        # SAFETY CHECK 2: Explicitly click the page to guarantee focus
-        page.mouse.click(200, 300) 
-        time.sleep(1)
+        print("Targeting the Title field...")
+        # explicitly click the first textbox (the Title)
+        editor = page.locator("role=textbox").first
+        editor.click()
         
-        print("Typing title...")
-        page.keyboard.type(title)
+        print("Inserting Title...")
+        # insert_text injects the string safely without needing Ctrl+V
+        page.keyboard.insert_text(title)
         page.keyboard.press("Enter")
+        time.sleep(1) # Give Medium a second to create the new paragraph block
         
-        print("Pasting body...")
-        page.evaluate("text => navigator.clipboard.writeText(text)", body)
-        page.keyboard.down("Control")
-        page.keyboard.press("v")
-        page.keyboard.up("Control")
+        print("Inserting Body...")
+        page.keyboard.insert_text(body)
         
-        print("Waiting for auto-save...")
-        # SAFETY CHECK 3: Wait longer to ensure Medium's cloud syncs the draft
+        print("Waiting 15 seconds for Medium to auto-save to cloud...")
         time.sleep(15) 
         
-        print("Draft successfully pasted into Medium!")
+        print("Draft successfully injected and saved!")
         browser.close()
