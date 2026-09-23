@@ -3,7 +3,7 @@ import os
 import time
 
 def generate_draft(topic):
-    print("Generating article with Gemini...")
+    print("Generating article with Gemini...", flush=True)
     
     client = genai.Client()
     
@@ -18,7 +18,6 @@ def generate_draft(topic):
     4. Add a brief disclosure at the very end stating AI assisted in drafting.
     """
     
-    # INCREASED RETRY LOGIC: Try 5 times, wait 60 seconds between tries (5 minutes total patience)
     max_retries = 5
     for attempt in range(max_retries):
         try:
@@ -29,8 +28,8 @@ def generate_draft(topic):
             break 
         except Exception as e:
             if "503" in str(e) or "429" in str(e) or "500" in str(e):
-                print(f"Server busy. Retrying in 60 seconds... (Attempt {attempt + 1} of {max_retries})")
-                time.sleep(60)
+                print(f"Server busy. Retrying in 15 seconds... (Attempt {attempt + 1} of {max_retries})", flush=True)
+                time.sleep(15)
                 if attempt == max_retries - 1:
                     raise Exception("Failed after maximum retries. Google's API is too congested today.") from e
             else:
