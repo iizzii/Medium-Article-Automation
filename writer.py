@@ -4,7 +4,6 @@ import os
 def generate_draft(topic):
     print("Generating article with Gemini...")
     
-    # The new SDK automatically picks up the GEMINI_API_KEY from environment variables
     client = genai.Client()
     
     prompt = f"""
@@ -18,9 +17,9 @@ def generate_draft(topic):
     4. Add a brief disclosure at the very end stating AI assisted in drafting.
     """
     
-    # Using the current active model
+    # Updated to the new 3.6 model
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-3.6-flash',
         contents=prompt
     )
     
