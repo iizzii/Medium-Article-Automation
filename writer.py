@@ -18,23 +18,23 @@ def generate_draft(topic):
     4. Add a brief disclosure at the very end stating AI assisted in drafting.
     """
     
-    # Retry logic: Try up to 3 times if the server is busy
-    max_retries = 3
+    # INCREASED RETRY LOGIC: Try 5 times, wait 60 seconds between tries (5 minutes total patience)
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
                 model='gemini-3.6-flash',
                 contents=prompt
             )
-            break # If successful, exit the retry loop
+            break 
         except Exception as e:
-            if "503" in str(e) or "429" in str(e):
-                print(f"Server busy. Retrying in 30 seconds... (Attempt {attempt + 1} of {max_retries})")
-                time.sleep(30)
+            if "503" in str(e) or "429" in str(e) or "500" in str(e):
+                print(f"Server busy. Retrying in 60 seconds... (Attempt {attempt + 1} of {max_retries})")
+                time.sleep(60)
                 if attempt == max_retries - 1:
-                    raise Exception("Failed after maximum retries.") from e
+                    raise Exception("Failed after maximum retries. Google's API is too congested today.") from e
             else:
-                raise e # If it's a different error, crash normally
+                raise e 
     
     lines = response.text.strip().split('\n')
     title = lines[0].replace('#', '').replace('*', '').strip()
