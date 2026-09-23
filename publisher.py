@@ -7,8 +7,6 @@ def push_to_medium(title, body):
     print("Starting headless browser to publish to Medium...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True) 
-        
-        # 1. Disguise the bot as a normal Windows Chrome browser to bypass security blocks
         context = browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
@@ -20,20 +18,31 @@ def push_to_medium(title, body):
         
         page = context.new_page()
         print("Navigating to editor...")
-        page.goto("https://medium.com/new-story", timeout=60000, wait_until="networkidle")
+        page.goto("https://medium.com/new-story", timeout=60000)
         
-        # 2. Strict Login Check: Did we actually make it to the editor?
         print(f"Current URL: {page.url}")
         if "new-story" not in page.url:
-            raise Exception("CRITICAL ERROR: Medium rejected the cookies and redirected us. Your session expired. You MUST export fresh cookies from your browser and update the MEDIUM_COOKIES secret in GitHub!")
+            raise Exception("CRITICAL ERROR: Medium rejected the cookies.")
         
-        print("Waiting for editor to load...")
-        # 3. Use the universal HTML attribute for rich-text editors
-        page.wait_for_selector("[contenteditable='true']", timeout=15000)
+        print("Waiting for Javascript to load...")
+        time.sleep(8) # Hard wait to ensure Medium's editor scripts fully load
+        
+        # Dismiss any random popups Medium might show
+        page.keyboard.press("Escape")
         
         print("Targeting the Title field...")
-        editor = page.locator("[contenteditable='true']").first
-        editor.click()
+        try:
+            # Method A: Look for the native 'Title' placeholder text
+            title_box = page.get_by_placeholder("Title")
+            title_box.wait_for(timeout=5000)
+            title_box.click()
+            print("Found placeholder successfully.")
+        except:
+            # Method B: Blind click where the title box is guaranteed to be
+            print("Could not find 'Title' placeholder. Clicking coordinates...")
+            # Click dead-center near the top of the screen
+            page.mouse.click(page.viewport_size['width'] / 2, 150)
+            time.sleep(1)
         
         print("Inserting Title...")
         page.keyboard.insert_text(title)
