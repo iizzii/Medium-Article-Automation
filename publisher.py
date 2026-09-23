@@ -7,8 +7,11 @@ def push_to_medium(title, body):
     print("Starting headless browser to publish to Medium...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True) 
+        
+        # Force a standard laptop screen size so coordinates are predictable
         context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 720}
         )
         
         cookie_data = os.environ.get("MEDIUM_COOKIES")
@@ -19,41 +22,32 @@ def push_to_medium(title, body):
         page = context.new_page()
         print("Navigating to editor...")
         page.goto("https://medium.com/new-story", timeout=60000)
+        time.sleep(10) # Let everything load
         
-        print(f"Current URL: {page.url}")
-        if "new-story" not in page.url:
-            raise Exception("CRITICAL ERROR: Medium rejected the cookies.")
+        # Take a picture of what the bot sees when it loads
+        page.screenshot(path="debug1_load.png")
+        print("Screenshot 1 saved.")
         
-        print("Waiting for Javascript to load...")
-        time.sleep(8) # Hard wait to ensure Medium's editor scripts fully load
-        
-        # Dismiss any random popups Medium might show
+        # Mash ESCAPE to aggressively close any banners or popups
         page.keyboard.press("Escape")
+        page.keyboard.press("Escape")
+        time.sleep(2)
         
-        print("Targeting the Title field...")
-        try:
-            # Method A: Look for the native 'Title' placeholder text
-            title_box = page.get_by_placeholder("Title")
-            title_box.wait_for(timeout=5000)
-            title_box.click()
-            print("Found placeholder successfully.")
-        except:
-            # Method B: Blind click where the title box is guaranteed to be
-            print("Could not find 'Title' placeholder. Clicking coordinates...")
-            # Click dead-center near the top of the screen
-            page.mouse.click(page.viewport_size['width'] / 2, 150)
-            time.sleep(1)
+        # Click exactly where the title box sits on a 1280x720 screen
+        page.mouse.click(300, 250)
+        time.sleep(1)
         
-        print("Inserting Title...")
+        print("Inserting Title & Body...")
         page.keyboard.insert_text(title)
         page.keyboard.press("Enter")
         time.sleep(2) 
-        
-        print("Inserting Body...")
         page.keyboard.insert_text(body)
         
-        print("Waiting 15 seconds for Medium to auto-save to cloud...")
-        time.sleep(15) 
+        # Take a picture of what it looks like after typing
+        time.sleep(3)
+        page.screenshot(path="debug2_typed.png")
+        print("Screenshot 2 saved.")
         
-        print("Draft successfully injected and saved!")
+        print("Waiting 15 seconds for Medium to auto-save...")
+        time.sleep(15) 
         browser.close()
