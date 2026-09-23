@@ -23,18 +23,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Playwright & System Dependencies
-      run: playwright install --with-deps chromium
-
     - name: Run Automator Script
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        MEDIUM_COOKIES: ${{ secrets.MEDIUM_COOKIES }}
+        MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
       run: python main.py
-
-    - name: Upload Debug Screenshots
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: debug-screenshots
-        path: "*.png"
