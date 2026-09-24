@@ -16,13 +16,14 @@ VIRAL MEDIUM FORMULA (STRICT RULES):
 3. Rhythm & White Space: 
    - Paragraphs must be 1 to 3 sentences maximum.
    - Use occasional single-sentence standalone lines for dramatic impact.
-   - Use **Bold Subheadings** to keep the piece intensely skimmable.
 4. Highlight Bait: Include 2 to 3 standalone, razor-sharp maxims that practically force readers to highlight them on Medium.
 5. Voice: Skeptical, conversational, and direct. Expose the gap between executive PR/vendor theater and ground-level technical reality.
 6. Banned AI Words: NEVER use "delve", "tapestry", "beacon", "game-changer", "testament", "crucial", "vital", or "in conclusion".
-7. Format:
-   - Line 1: **Title** (Punchy, tension-filled, high curiosity—no cheap clickbait).
-   - Body: Clean text using **bold headers** for sections and bold inline emphasis on critical punchlines.
+
+FORMATTING - READ CAREFULLY:
+- Do NOT use markdown headers like `#` or `##` anywhere in the text.
+- To create a subheading, simply write the text and wrap it in double asterisks like this: **The Silent Threat**
+- Line 1 must be the Title, wrapped in double asterisks: **Title Goes Here**
 """
 
 ART_DIRECTOR_PROMPT = """
@@ -36,14 +37,10 @@ The 3 visual styles must be entirely different from each other:
 CRITICAL RULES:
 1. NO TEXT OR LETTERS IN ANY IMAGE.
 2. NO GENERIC STOCK CONCEPTS (no businessmen shaking hands, no generic laptops). Use tangible visual metaphors.
-3. Format your output strictly as a numbered list with the raw prompts ONLY. Example:
-1. [Prompt 1]
-2. [Prompt 2]
-3. [Prompt 3]
+3. Format your output strictly as a numbered list with the raw prompts ONLY.
 """
 
 def call_llm(prompt, task_name):
-    """Fallback engine: Tries Gemini first, then dynamically routes to an active Groq text model."""
     try:
         client = genai.Client()
         for _ in range(2):
@@ -74,7 +71,6 @@ def call_llm(prompt, task_name):
 def generate_curated_draft(topic):
     print(f"\n--- DRAFTING SINGLE VIRAL ARTICLE ---", flush=True)
     
-    # 1. Generate Article
     article_prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth and structural threat model hidden behind this headline."
     article_text, text_model = call_llm(article_prompt, "Article Generation")
     print(f"[ENGINE LOG] Article generated using: {text_model}", flush=True)
@@ -83,17 +79,12 @@ def generate_curated_draft(topic):
         raise Exception("CRITICAL ERROR: Failed to generate article across all providers.")
 
     lines = article_text.split('\n')
-    title = lines[0].replace('*', '').replace('#', '').strip()
+    title = lines[0].replace('#', '').strip()
     body = '\n'.join(lines[1:]).strip()
     
-    print(f"[PREVIEW] Title: {title}", flush=True)
-    print(f"[PREVIEW] Word Count: ~{len(body.split())} words", flush=True)
-    
-    # NEW: Pause to let Groq's Tokens-Per-Minute rate limit reset
     print("\n[LOG] Pausing for 15 seconds to respect AI API rate limits...", flush=True)
     time.sleep(15)
     
-    # 2. Generate 3 distinct image prompts
     image_prompt_request = f"{ART_DIRECTOR_PROMPT}\n\n[ARTICLE TEXT]:\nTitle: {title}\n{body[:1200]}"
     image_prompts_text, img_model = call_llm(image_prompt_request, "Image Prompt Generation")
     print(f"[ENGINE LOG] Image prompts engineered using: {img_model}", flush=True)
