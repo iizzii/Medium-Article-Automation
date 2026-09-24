@@ -1,11 +1,11 @@
 from news_fetcher import get_top_5_topics
-from publisher import wait_for_user_selection, push_options_to_telegram
-from writer import generate_three_drafts
+from publisher import wait_for_user_selection, push_curated_to_telegram
+from writer import generate_curated_draft
 import sys
 
 def main():
     print("\n" + "="*50, flush=True)
-    print("[SYSTEM LOG] PIPELINE INITIATED", flush=True)
+    print("[SYSTEM LOG] SINGLE VIRAL PIPELINE INITIATED", flush=True)
     print("="*50 + "\n", flush=True)
 
     print("[LOG] Fetching Top 5 Trending Topics from RSS...", flush=True)
@@ -15,10 +15,10 @@ def main():
     print(f"\n[LOG] PROCEEDING WITH TOPIC: {selected_topic}\n", flush=True)
     
     print("[LOG] Handing off to Writer Engine...", flush=True)
-    drafts = generate_three_drafts(selected_topic)
+    title, body, image_prompts = generate_curated_draft(selected_topic)
 
     print("\n[LOG] Handing off to Publisher Engine for Telegram Delivery...", flush=True)
-    push_options_to_telegram(drafts)
+    push_curated_to_telegram(title, body, image_prompts)
     
     print("\n" + "="*50, flush=True)
     print("[SYSTEM LOG] PIPELINE SUCCESSFULLY COMPLETED", flush=True)
