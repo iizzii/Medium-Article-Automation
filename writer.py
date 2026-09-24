@@ -52,13 +52,26 @@ def generate_single_draft(topic, angle_description):
     except Exception:
         pass
         
-    # ATTEMPT 2: Fallback to Groq (llama-3.1-8b-instant)
+    # ATTEMPT 2: Fallback to Groq
     if not response_text:
         try:
             groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+            
+            # Dynamically fetch all models your specific key has access to
+            available_models = groq_client.models.list().data
+            
+            # Filter out audio transcription and safety guardrails to find a standard text AI
+            text_models = [m.id for m in available_models if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
+            
+            if not text_models:
+                raise Exception("No valid text models found in your Groq account.")
+                
+            selected_model = text_models[0]
+            print(f"Google failed. Falling back to Groq dynamically using: {selected_model}...", flush=True)
+
             chat_completion = groq_client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                model="llama-3.3-70b-versatile",
+                model=selected_model,
             )
             response_text = chat_completion.choices[0].message.content
         except Exception as e:
