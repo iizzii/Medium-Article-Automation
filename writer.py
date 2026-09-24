@@ -53,7 +53,7 @@ def generate_draft(topic):
                         "content": prompt
                     }
                 ],
-                model="llama3-8b-8192", 
+                model="llama-3.1-8b-instant", # Updated current model
             )
             response_text = chat_completion.choices[0].message.content
             print("Successfully generated draft using Groq!", flush=True)
