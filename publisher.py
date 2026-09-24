@@ -1,8 +1,6 @@
 import requests
 import os
 import time
-from google import genai
-from google.genai import types
 
 def get_latest_update_id(bot_token):
     url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
@@ -23,7 +21,7 @@ def wait_for_user_selection(topics):
         msg += f"{i}. {t}\n\n"
     msg += "_Reply with a number (1-5) within the next 3 minutes._"
     
-    print("[LOG] Sending menu to Telegram. Waiting 3 minutes for response...", flush=True)
+    print("[LOG] Sending menu to Telegram. Waiting 3 minutes...", flush=True)
     requests.post(
         f"https://api.telegram.org/bot{bot_token}/sendMessage", 
         json={"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
@@ -49,8 +47,7 @@ def wait_for_user_selection(topics):
                             print(f"[LOG] User selected topic {text}: {selection}", flush=True)
                             requests.post(
                                 f"https://api.telegram.org/bot{bot_token}/sendMessage", 
-                                json={"chat_id": chat_id, "text": f"✅ Confirmed. Crafting viral article and 3 cover variants...", "parse_mode": "Markdown"},
-                                timeout=15
+                                json={"chat_id": chat_id, "text": f"✅ Confirmed. Crafting viral article and 3 cover variants...", "parse_mode": "Markdown"}
                             )
                             return selection
         except Exception:
@@ -58,60 +55,73 @@ def wait_for_user_selection(topics):
         time.sleep(10)
         
     print("[LOG] 3-minute timeout reached. Auto-selecting Topic 1.", flush=True)
-    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", json={"chat_id": chat_id, "text": "⏱️ *Timeout reached.* Auto-selecting Topic 1.", "parse_mode": "Markdown"}, timeout=15)
+    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", json={"chat_id": chat_id, "text": "⏱️ *Timeout reached.* Auto-selecting Topic 1.", "parse_mode": "Markdown"})
     return topics[0]
 
-def send_telegram_imagen(bot_token, chat_id, prompt_text, caption):
-    """Generates a flagship image via Google Imagen 3 and uploads it natively to Telegram."""
-    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+def query_huggingface(model_id, prompt_text, hf_token):
+    """Hits the Hugging Face Serverless API and downloads the image bytes."""
+    url = f"https://api-inference.huggingface.co/models/{model_id}"
+    headers = {"Authorization": f"Bearer {hf_token}"}
+    payload = {"inputs": prompt_text}
     
-    try:
-        print(f"[LOG] Calling Google Imagen 3 API...", flush=True)
-        result = client.models.generate_images(
-            model='imagen-3.0-generate-002',
-            prompt=prompt_text,
-            config=types.GenerateImagesConfig(
-                number_of_images=1,
-                aspect_ratio="16:9",
-                person_generation="ALLOW_ADULT",
-                output_mime_type="image/jpeg"
-            )
-        )
+    for attempt in range(3):
+        print(f"[LOG] Calling Hugging Face model {model_id} (Attempt {attempt+1}/3)...", flush=True)
+        res = requests.post(url, headers=headers, json=payload, timeout=60)
         
-        image_bytes = result.generated_images[0].image.image_bytes
-        image_path = "cover_image.jpg"
+        if res.status_code == 200:
+            return res.content
+        elif res.status_code == 503:
+            # Hugging Face models "sleep" when unused. A 503 just means it's waking up.
+            print("[WARN] Model is spinning up on Hugging Face servers. Waiting 20 seconds...", flush=True)
+            time.sleep(20)
+        else:
+            print(f"[ERROR] Hugging Face API failed: {res.status_code} - {res.text}", flush=True)
+            break
+    return None
+
+def send_telegram_photo_bytes(bot_token, chat_id, image_bytes, caption):
+    url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+    
+    # Save physically to the GitHub runner temporarily
+    with open("temp_cover.jpg", "wb") as f:
+        f.write(image_bytes)
         
-        with open(image_path, "wb") as f:
-            f.write(image_bytes)
-            
-        print("[LOG] Imagen 3 photo generated. Uploading to Telegram...", flush=True)
-        url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+    # Upload physically to Telegram
+    with open("temp_cover.jpg", "rb") as photo:
+        payload = {"chat_id": chat_id, "caption": caption[:1024], "parse_mode": "Markdown"}
+        res = requests.post(url, data=payload, files={"photo": photo}, timeout=30)
         
-        with open(image_path, "rb") as photo:
-            payload = {"chat_id": chat_id, "caption": caption[:1024], "parse_mode": "Markdown"}
+        if res.status_code != 200:
+            payload["parse_mode"] = ""
+            photo.seek(0)
             res = requests.post(url, data=payload, files={"photo": photo}, timeout=30)
             
-            if res.status_code != 200:
-                payload["parse_mode"] = ""
-                photo.seek(0)
-                res = requests.post(url, data=payload, files={"photo": photo}, timeout=30)
-                
-        print(f"[TELEGRAM PHOTO STATUS] HTTP {res.status_code}", flush=True)
-        
-    except Exception as e:
-        print(f"[ERROR] Failed to generate or send Imagen photo: {e}", flush=True)
+    print(f"[TELEGRAM PHOTO STATUS] HTTP {res.status_code}", flush=True)
 
 def push_curated_to_telegram(title, body, image_prompts):
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    hf_token = os.environ.get("HF_TOKEN")
     
-    if not bot_token or not chat_id:
-        raise ValueError("CRITICAL: Telegram credentials missing!")
+    if not bot_token or not chat_id or not hf_token:
+        raise ValueError("CRITICAL: Telegram or Hugging Face credentials missing!")
+
+    # 3 elite open-source models mapped to our 3 artistic styles
+    models = [
+        ("black-forest-labs/FLUX.1-schnell", "FLUX.1 (Hyper-Realism)"),
+        ("stabilityai/stable-diffusion-xl-base-1.0", "SDXL (Cinematic)"),
+        ("prompthero/openjourney", "OpenJourney (Stylized)")
+    ]
 
     print("\n[LOG] Generating and dispatching 3 distinct Cover Image options...", flush=True)
-    for idx, prompt_text in enumerate(image_prompts, 1):
-        caption = f"🎨 *COVER OPTION {idx} — IMAGEN 3*\n\n*Prompt:* _{prompt_text}_"
-        send_telegram_imagen(bot_token, chat_id, prompt_text, caption)
+    # Zip together the 3 prompts your Art Director generated with the 3 distinct AI models
+    for idx, (prompt_text, model_info) in enumerate(zip(image_prompts, models), 1):
+        model_id, label = model_info
+        
+        image_bytes = query_huggingface(model_id, prompt_text, hf_token)
+        if image_bytes:
+            caption = f"🎨 *COVER OPTION {idx} — {label}*\n\n*Prompt:* _{prompt_text}_"
+            send_telegram_photo_bytes(bot_token, chat_id, image_bytes, caption)
         time.sleep(2)
 
     print("\n[LOG] Dispatching final curated article text...", flush=True)
