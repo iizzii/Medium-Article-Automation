@@ -71,7 +71,6 @@ def call_llm(prompt, task_name):
         
     return None, "FAILED ALL MODELS"
 
-
 def generate_curated_draft(topic):
     print(f"\n--- DRAFTING SINGLE VIRAL ARTICLE ---", flush=True)
     
@@ -90,19 +89,21 @@ def generate_curated_draft(topic):
     print(f"[PREVIEW] Title: {title}", flush=True)
     print(f"[PREVIEW] Word Count: ~{len(body.split())} words", flush=True)
     
+    # NEW: Pause to let Groq's Tokens-Per-Minute rate limit reset
+    print("\n[LOG] Pausing for 15 seconds to respect AI API rate limits...", flush=True)
+    time.sleep(15)
+    
     # 2. Generate 3 distinct image prompts
     image_prompt_request = f"{ART_DIRECTOR_PROMPT}\n\n[ARTICLE TEXT]:\nTitle: {title}\n{body[:1200]}"
     image_prompts_text, img_model = call_llm(image_prompt_request, "Image Prompt Generation")
     print(f"[ENGINE LOG] Image prompts engineered using: {img_model}", flush=True)
     
-    # Parse the 3 prompts out safely
     image_prompts = []
     if image_prompts_text:
         matches = re.findall(r'^\d+\.\s*(.+)', image_prompts_text, flags=re.MULTILINE)
         if matches:
             image_prompts = [m.strip() for m in matches[:3]]
     
-    # Backup safety net if the parser misses
     while len(image_prompts) < 3:
         image_prompts.append(f"Cinematic tech editorial illustration representing {title}, high end corporate cyber, abstract, no text, highly detailed.")
 
