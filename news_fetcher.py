@@ -1,16 +1,16 @@
 import feedparser
-import random
 
-def get_trending_topic():
-    # Fetches top tech news from Google News India
+def get_top_5_topics():
     rss_url = "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"
     feed = feedparser.parse(rss_url)
     
     if not feed.entries:
-        return "The hidden technical debt of AI integration in enterprise cybersecurity"
+        return [
+            "The hidden technical debt of AI integration",
+            "Why Zero Trust is failing in Indian startups",
+            "The truth behind enterprise cloud security",
+            "Alert fatigue in modern SOCs",
+            "Balancing speed and security in 2026"
+        ]
         
-    # Select one of the top 5 trending headlines to ensure variety every day
-    top_entries = feed.entries[:5]
-    selected = random.choice(top_entries)
-    
-    return selected.title
+    return [entry.title for entry in feed.entries[:5]]
