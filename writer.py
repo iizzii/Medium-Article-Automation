@@ -1,11 +1,10 @@
 from google import genai
+from groq import Groq
 import os
 import time
 
 def generate_draft(topic):
-    print("Generating article with Gemini...", flush=True)
-    
-    client = genai.Client()
+    print("Generating article...", flush=True)
     
     prompt = f"""
     You are a top Medium writer focusing on Indian corporate life and AI trends. 
@@ -18,41 +17,53 @@ def generate_draft(topic):
     4. Add a brief disclosure at the very end stating AI assisted in drafting.
     """
     
-    # List of models to try in order of preference
-    fallback_models = ['gemini-3.6-flash', 'gemini-3.6-pro']
+    response_text = None
     
-    response = None
-    
-    # Loop through each model in the list
-    for current_model in fallback_models:
-        print(f"\nAttempting generation with model: {current_model}...", flush=True)
-        
-        # Try each model 3 times before giving up and moving to the next backup
-        max_retries = 3 
-        for attempt in range(max_retries):
+    # ATTEMPT 1: Google Gemini
+    print("Attempting generation with Google Gemini (gemini-3.6-flash)...", flush=True)
+    try:
+        client = genai.Client()
+        for attempt in range(3):
             try:
                 response = client.models.generate_content(
-                    model=current_model,
+                    model='gemini-3.6-flash',
                     contents=prompt
                 )
-                break 
+                response_text = response.text
+                print("Successfully generated draft using Google Gemini!", flush=True)
+                break
             except Exception as e:
-                if "503" in str(e) or "429" in str(e) or "500" in str(e):
-                    print(f"[{current_model}] Server busy. Retrying in 20 seconds... (Attempt {attempt + 1} of {max_retries})", flush=True)
-                    time.sleep(20)
+                if "503" in str(e) or "429" in str(e):
+                    print(f"[Gemini] Busy or Quota hit. Retrying... (Attempt {attempt + 1} of 3)", flush=True)
+                    time.sleep(15)
                 else:
-                    print(f"[{current_model}] Error: {e}", flush=True)
-                    break 
+                    raise e
+    except Exception as e:
+        print(f"Gemini failed completely: {e}", flush=True)
         
-        # If response was successfully generated, break the fallback loop early
-        if response:
-            print(f"Successfully generated draft using {current_model}!", flush=True)
-            break 
+    # ATTEMPT 2: Fallback to Groq (Llama 3)
+    if not response_text:
+        print("\nGoogle failed. Falling back to Groq (Meta Llama 3)...", flush=True)
+        try:
+            groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+            chat_completion = groq_client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                model="llama3-8b-8192", 
+            )
+            response_text = chat_completion.choices[0].message.content
+            print("Successfully generated draft using Groq!", flush=True)
+        except Exception as e:
+            print(f"Groq failed: {e}", flush=True)
             
-    if not response:
-        raise Exception("CRITICAL: All fallback models failed to generate content.")
+    if not response_text:
+        raise Exception("CRITICAL: Both Gemini and Groq failed to generate content.")
         
-    lines = response.text.strip().split('\n')
+    lines = response_text.strip().split('\n')
     title = lines[0].replace('#', '').replace('*', '').strip()
     body = '\n'.join(lines[1:]).strip()
     
