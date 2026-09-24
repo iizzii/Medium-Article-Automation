@@ -1,6 +1,7 @@
 import requests
 import os
 import time
+import urllib.parse
 
 def get_latest_update_id(bot_token):
     url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
@@ -59,34 +60,36 @@ def wait_for_user_selection(topics):
     return topics[0]
 
 def query_huggingface(model_id, prompt_text, hf_token):
-    """Hits the Hugging Face Serverless API and downloads the image bytes."""
+    """Hits the Hugging Face Serverless API and downloads the image bytes, with robust error handling."""
     url = f"https://api-inference.huggingface.co/models/{model_id}"
     headers = {"Authorization": f"Bearer {hf_token}"}
     payload = {"inputs": prompt_text}
     
     for attempt in range(3):
-        print(f"[LOG] Calling Hugging Face model {model_id} (Attempt {attempt+1}/3)...", flush=True)
-        res = requests.post(url, headers=headers, json=payload, timeout=60)
-        
-        if res.status_code == 200:
-            return res.content
-        elif res.status_code == 503:
-            # Hugging Face models "sleep" when unused. A 503 just means it's waking up.
-            print("[WARN] Model is spinning up on Hugging Face servers. Waiting 20 seconds...", flush=True)
-            time.sleep(20)
-        else:
-            print(f"[ERROR] Hugging Face API failed: {res.status_code} - {res.text}", flush=True)
-            break
+        try:
+            print(f"[LOG] Calling Hugging Face model {model_id} (Attempt {attempt+1}/3)...", flush=True)
+            res = requests.post(url, headers=headers, json=payload, timeout=60)
+            
+            if res.status_code == 200:
+                return res.content
+            elif res.status_code == 503:
+                print("[WARN] Model is spinning up on Hugging Face servers. Waiting 20 seconds...", flush=True)
+                time.sleep(20)
+            else:
+                print(f"[ERROR] Hugging Face API failed: {res.status_code} - {res.text[:100]}", flush=True)
+                break
+        except Exception as e:
+            print(f"[ERROR] Network/Connection error on attempt {attempt+1}: {e}", flush=True)
+            time.sleep(5)
+            
     return None
 
 def send_telegram_photo_bytes(bot_token, chat_id, image_bytes, caption):
     url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
     
-    # Save physically to the GitHub runner temporarily
     with open("temp_cover.jpg", "wb") as f:
         f.write(image_bytes)
         
-    # Upload physically to Telegram
     with open("temp_cover.jpg", "rb") as photo:
         payload = {"chat_id": chat_id, "caption": caption[:1024], "parse_mode": "Markdown"}
         res = requests.post(url, data=payload, files={"photo": photo}, timeout=30)
@@ -106,7 +109,6 @@ def push_curated_to_telegram(title, body, image_prompts):
     if not bot_token or not chat_id or not hf_token:
         raise ValueError("CRITICAL: Telegram or Hugging Face credentials missing!")
 
-    # 3 elite open-source models mapped to our 3 artistic styles
     models = [
         ("black-forest-labs/FLUX.1-schnell", "FLUX.1 (Hyper-Realism)"),
         ("stabilityai/stable-diffusion-xl-base-1.0", "SDXL (Cinematic)"),
@@ -114,15 +116,28 @@ def push_curated_to_telegram(title, body, image_prompts):
     ]
 
     print("\n[LOG] Generating and dispatching 3 distinct Cover Image options...", flush=True)
-    # Zip together the 3 prompts your Art Director generated with the 3 distinct AI models
     for idx, (prompt_text, model_info) in enumerate(zip(image_prompts, models), 1):
         model_id, label = model_info
         
         image_bytes = query_huggingface(model_id, prompt_text, hf_token)
+        
+        # IRON-CLAD BACKUP: If HF fails, reroute immediately to Pollinations high-end FLUX model
+        if not image_bytes:
+            print(f"[WARN] Hugging Face failed for {label}. Rerouting to Pollinations FLUX Engine...", flush=True)
+            try:
+                encoded = urllib.parse.quote(prompt_text)
+                fallback_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1200&height=800&nologo=true&model=flux"
+                res = requests.get(fallback_url, timeout=30)
+                if res.status_code == 200:
+                    image_bytes = res.content
+                    label = f"{label} [Fallback Engine]"
+            except Exception as e:
+                print(f"[ERROR] Fallback image engine also failed: {e}", flush=True)
+
         if image_bytes:
             caption = f"🎨 *COVER OPTION {idx} — {label}*\n\n*Prompt:* _{prompt_text}_"
             send_telegram_photo_bytes(bot_token, chat_id, image_bytes, caption)
-        time.sleep(2)
+        time.sleep(3)
 
     print("\n[LOG] Dispatching final curated article text...", flush=True)
     article_text = f"**{title}**\n\n{body}"
