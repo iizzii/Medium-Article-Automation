@@ -2,6 +2,7 @@ from google import genai
 from groq import Groq
 import os
 import time
+import re
 
 VIRAL_SYSTEM_PERSONA = """
 You are an elite, viral tech essayist with the unspoken instincts of a 14-year veteran in enterprise cybersecurity and systems architecture.
@@ -25,60 +26,62 @@ VIRAL MEDIUM FORMULA (STRICT RULES):
 """
 
 ART_DIRECTOR_PROMPT = """
-You are an Expert Art Director and Image Prompt Engineer. Analyze the [ARTICLE TEXT] and generate a single, highly detailed, visually striking image generation prompt capturing the core theme.
+You are an Expert Art Director and Image Prompt Engineer. Analyze the [ARTICLE TEXT] and generate exactly THREE distinct, highly detailed, visually striking image generation prompts capturing the core theme.
 
-Formula: [Main Subject/Visual Metaphor] + [Specific Setting/Environment] + [Lighting & Atmosphere] + [Artistic Style/Medium] + [Camera Angle/Composition] + [Color Palette/Mood]
+The 3 visual styles must be entirely different from each other:
+1. Cinematic realism/photographic (e.g., highly detailed, moody, dramatic lighting)
+2. High-end 3D abstract/metaphorical render (e.g., Unreal Engine 5, glowing data, architectural)
+3. Minimalist graphic editorial (e.g., high-contrast, stylized, retro-futuristic)
 
 CRITICAL RULES:
-1. NO TEXT OR LETTERS IN THE IMAGE.
+1. NO TEXT OR LETTERS IN ANY IMAGE.
 2. NO GENERIC STOCK CONCEPTS (no businessmen shaking hands, no generic laptops). Use tangible visual metaphors.
-3. SPECIFY HIGH-END MEDIUM: e.g., Cinematic 35mm photography, Unreal Engine 5 render, or high-contrast architectural editorial.
-4. NO CHATTY OUTPUT: Output the prompt string and nothing else.
+3. Format your output strictly as a numbered list with the raw prompts ONLY. Example:
+1. [Prompt 1]
+2. [Prompt 2]
+3. [Prompt 3]
 """
 
 def call_llm(prompt, task_name):
     """Fallback engine: Tries Gemini first, then dynamically routes to an active Groq text model."""
-    # 1. Try Gemini
     try:
         client = genai.Client()
         for _ in range(2):
             try:
                 res = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
-                if res.text: 
-                    return res.text.strip(), "Google Gemini (gemini-3.6-flash)"
-            except Exception:
+                if res.text: return res.text.strip(), "Google Gemini (gemini-3.6-flash)"
+            except:
                 time.sleep(4)
-    except Exception:
+    except:
         pass
         
-    # 2. Try Groq Dynamic
     try:
         groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
         available_models = groq_client.models.list().data
         text_models = [m.id for m in available_models if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
         
         if text_models:
-            model_to_use = text_models[0]
             res = groq_client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                model=model_to_use,
+                model=text_models[0],
             )
-            if res.choices: 
-                return res.choices[0].message.content.strip(), f"Groq ({model_to_use})"
-    except Exception:
+            if res.choices: return res.choices[0].message.content.strip(), f"Groq ({text_models[0]})"
+    except:
         pass
         
     return None, "FAILED ALL MODELS"
 
-def generate_single_draft(topic, angle_description):
-    print(f"\n--- DRAFTING VIRAL OPTION: {angle_description[:30]}... ---", flush=True)
+
+def generate_curated_draft(topic):
+    print(f"\n--- DRAFTING SINGLE VIRAL ARTICLE ---", flush=True)
     
-    article_prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: {angle_description}"
+    # 1. Generate Article
+    article_prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth and structural threat model hidden behind this headline."
     article_text, text_model = call_llm(article_prompt, "Article Generation")
     print(f"[ENGINE LOG] Article generated using: {text_model}", flush=True)
     
     if not article_text:
-        return None, None, None
+        raise Exception("CRITICAL ERROR: Failed to generate article across all providers.")
 
     lines = article_text.split('\n')
     title = lines[0].replace('*', '').replace('#', '').strip()
@@ -87,37 +90,20 @@ def generate_single_draft(topic, angle_description):
     print(f"[PREVIEW] Title: {title}", flush=True)
     print(f"[PREVIEW] Word Count: ~{len(body.split())} words", flush=True)
     
-    # Generate bespoke Art Director prompt for the image
+    # 2. Generate 3 distinct image prompts
     image_prompt_request = f"{ART_DIRECTOR_PROMPT}\n\n[ARTICLE TEXT]:\nTitle: {title}\n{body[:1200]}"
-    image_prompt, img_model = call_llm(image_prompt_request, "Image Prompt Generation")
-    print(f"[ENGINE LOG] Image prompt engineered using: {img_model}", flush=True)
+    image_prompts_text, img_model = call_llm(image_prompt_request, "Image Prompt Generation")
+    print(f"[ENGINE LOG] Image prompts engineered using: {img_model}", flush=True)
     
-    if not image_prompt:
-        image_prompt = f"Cinematic minimalist tech editorial illustration representing {title}, atmospheric lighting, abstract infrastructure, no text."
-
-    return title, body, image_prompt
-
-def generate_three_drafts(topic):
-    angles = [
-        ("The Uncomfortable Truth", "Expose the unspoken failure mode or corporate illusion behind the headline. Call out the vanity metrics and theater."),
-        ("The Second-Order Threat", "Unpack the cascading technical and organizational risks that everyone is sleeping on. Frame it through incentives and blast radius."),
-        ("The Contrarian Playbook", "Challenge conventional wisdom. Give practitioners a sharp, counter-intuitive rule of thumb on what actually works.")
-    ]
+    # Parse the 3 prompts out safely
+    image_prompts = []
+    if image_prompts_text:
+        matches = re.findall(r'^\d+\.\s*(.+)', image_prompts_text, flags=re.MULTILINE)
+        if matches:
+            image_prompts = [m.strip() for m in matches[:3]]
     
-    drafts = []
-    for i, (label, angle) in enumerate(angles, 1):
-        title, body, img_prompt = generate_single_draft(topic, angle)
-        if title and body:
-            drafts.append({
-                "option_num": i,
-                "label": label,
-                "title": title,
-                "body": body,
-                "image_prompt": img_prompt
-            })
-        time.sleep(2) 
-        
-    if not drafts:
-        raise Exception("CRITICAL ERROR: Failed to generate drafts across all providers.")
-        
-    return drafts
+    # Backup safety net if the parser misses
+    while len(image_prompts) < 3:
+        image_prompts.append(f"Cinematic tech editorial illustration representing {title}, high end corporate cyber, abstract, no text, highly detailed.")
+
+    return title, body, image_prompts
