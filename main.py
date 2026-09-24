@@ -1,20 +1,29 @@
 from news_fetcher import get_top_5_topics
 from publisher import wait_for_user_selection, push_options_to_telegram
 from writer import generate_three_drafts
+import sys
 
 def main():
-    print("Fetching Top 5 Topics...", flush=True)
+    print("\n" + "="*50, flush=True)
+    print("[SYSTEM LOG] PIPELINE INITIATED", flush=True)
+    print("="*50 + "\n", flush=True)
+
+    print("[LOG] Fetching Top 5 Trending Topics from RSS...", flush=True)
     topics = get_top_5_topics()
     
-    # This will pause the GitHub Action until you reply on Telegram (max 10 mins)
     selected_topic = wait_for_user_selection(topics)
+    print(f"\n[LOG] PROCEEDING WITH TOPIC: {selected_topic}\n", flush=True)
     
-    print(f"Generating 3 drafts for: {selected_topic}", flush=True)
+    print("[LOG] Handing off to Writer Engine...", flush=True)
     drafts = generate_three_drafts(selected_topic)
 
-    print("Dispatching finalized articles to Telegram...", flush=True)
+    print("\n[LOG] Handing off to Publisher Engine for Telegram Delivery...", flush=True)
     push_options_to_telegram(drafts)
-    print("All done!", flush=True)
+    
+    print("\n" + "="*50, flush=True)
+    print("[SYSTEM LOG] PIPELINE SUCCESSFULLY COMPLETED", flush=True)
+    print("="*50 + "\n", flush=True)
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
