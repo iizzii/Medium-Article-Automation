@@ -1,8 +1,8 @@
 import requests
 import os
 import time
-import urllib.parse
-import random
+from google import genai
+from google.genai import types
 
 def get_latest_update_id(bot_token):
     url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
@@ -35,8 +35,7 @@ def wait_for_user_selection(topics):
     
     for _ in range(18): 
         url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
-        if offset: 
-            url += f"?offset={offset}"
+        if offset: url += f"?offset={offset}"
         
         try:
             res = requests.get(url, timeout=10).json()
@@ -50,7 +49,7 @@ def wait_for_user_selection(topics):
                             print(f"[LOG] User selected topic {text}: {selection}", flush=True)
                             requests.post(
                                 f"https://api.telegram.org/bot{bot_token}/sendMessage", 
-                                json={"chat_id": chat_id, "text": f"✅ Confirmed. Generating 3 angles for:\n*{selection}*", "parse_mode": "Markdown"},
+                                json={"chat_id": chat_id, "text": f"✅ Confirmed. Crafting viral article and 3 cover variants...", "parse_mode": "Markdown"},
                                 timeout=15
                             )
                             return selection
@@ -59,36 +58,71 @@ def wait_for_user_selection(topics):
         time.sleep(10)
         
     print("[LOG] 3-minute timeout reached. Auto-selecting Topic 1.", flush=True)
-    requests.post(
-        f"https://api.telegram.org/bot{bot_token}/sendMessage", 
-        json={"chat_id": chat_id, "text": "⏱️ *Timeout reached.* Auto-selecting Topic 1.", "parse_mode": "Markdown"},
-        timeout=15
-    )
+    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", json={"chat_id": chat_id, "text": "⏱️ *Timeout reached.* Auto-selecting Topic 1.", "parse_mode": "Markdown"}, timeout=15)
     return topics[0]
 
-def send_telegram_photo(bot_token, chat_id, image_url, caption):
-    url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
-    payload = {
-        "chat_id": chat_id, 
-        "photo": image_url, 
-        "caption": caption[:1024], # Telegram photo captions max at 1024 chars
-        "parse_mode": "Markdown"
-    }
-    res = requests.post(url, json=payload, timeout=30)
-    if res.status_code != 200:
-        # Retry with plain text caption if markdown formatting triggers an error
-        payload["parse_mode"] = ""
-        res = requests.post(url, json=payload, timeout=30)
-    print(f"[TELEGRAM PHOTO STATUS] Code {res.status_code}", flush=True)
+def send_telegram_imagen(bot_token, chat_id, prompt_text, caption):
+    """Generates a flagship image via Google Imagen 3 and uploads it natively to Telegram."""
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+    
+    try:
+        print(f"[LOG] Calling Google Imagen 3 API...", flush=True)
+        result = client.models.generate_images(
+            model='imagen-3.0-generate-002',
+            prompt=prompt_text,
+            config=types.GenerateImagesConfig(
+                number_of_images=1,
+                aspect_ratio="16:9",
+                person_generation="ALLOW_ADULT",
+                output_mime_type="image/jpeg"
+            )
+        )
+        
+        image_bytes = result.generated_images[0].image.image_bytes
+        image_path = "cover_image.jpg"
+        
+        with open(image_path, "wb") as f:
+            f.write(image_bytes)
+            
+        print("[LOG] Imagen 3 photo generated. Uploading to Telegram...", flush=True)
+        url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+        
+        with open(image_path, "rb") as photo:
+            payload = {"chat_id": chat_id, "caption": caption[:1024], "parse_mode": "Markdown"}
+            res = requests.post(url, data=payload, files={"photo": photo}, timeout=30)
+            
+            if res.status_code != 200:
+                payload["parse_mode"] = ""
+                photo.seek(0)
+                res = requests.post(url, data=payload, files={"photo": photo}, timeout=30)
+                
+        print(f"[TELEGRAM PHOTO STATUS] HTTP {res.status_code}", flush=True)
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to generate or send Imagen photo: {e}", flush=True)
 
-def send_telegram_text_chunks(bot_token, chat_id, full_text):
-    """Splits articles exceeding 3,800 characters into safe chunks at paragraph breaks."""
+def push_curated_to_telegram(title, body, image_prompts):
+    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    
+    if not bot_token or not chat_id:
+        raise ValueError("CRITICAL: Telegram credentials missing!")
+
+    print("\n[LOG] Generating and dispatching 3 distinct Cover Image options...", flush=True)
+    for idx, prompt_text in enumerate(image_prompts, 1):
+        caption = f"🎨 *COVER OPTION {idx} — IMAGEN 3*\n\n*Prompt:* _{prompt_text}_"
+        send_telegram_imagen(bot_token, chat_id, prompt_text, caption)
+        time.sleep(2)
+
+    print("\n[LOG] Dispatching final curated article text...", flush=True)
+    article_text = f"**{title}**\n\n{body}"
+    
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     MAX_LENGTH = 3800
     chunks = []
     current_chunk = ""
     
-    for paragraph in full_text.split('\n'):
+    for paragraph in article_text.split('\n'):
         if len(current_chunk) + len(paragraph) + 1 > MAX_LENGTH:
             chunks.append(current_chunk.strip())
             current_chunk = paragraph + "\n"
@@ -100,56 +134,12 @@ def send_telegram_text_chunks(bot_token, chat_id, full_text):
         
     total_parts = len(chunks)
     for idx, chunk in enumerate(chunks, 1):
-        payload = {
-            "chat_id": chat_id,
-            "text": chunk,
-            "parse_mode": "Markdown"
-        }
+        payload = {"chat_id": chat_id, "text": chunk, "parse_mode": "Markdown"}
         res = requests.post(url, json=payload, timeout=15)
         
-        # If Telegram rejects markdown formatting (e.g. unclosed asterisks), retry as plain text
         if res.status_code != 200:
-            print(f"[WARN] Markdown delivery failed for part {idx}/{total_parts}. Retrying as raw text...", flush=True)
             payload["parse_mode"] = ""
             res = requests.post(url, json=payload, timeout=15)
             
         print(f"[TELEGRAM TEXT STATUS] Part {idx}/{total_parts}: HTTP {res.status_code}", flush=True)
-        if res.status_code != 200:
-            print(f"[ERROR RESPONSE] {res.text}", flush=True)
-            
         time.sleep(1)
-
-def push_options_to_telegram(drafts):
-    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-    
-    if not bot_token or not chat_id:
-        raise ValueError("CRITICAL: Telegram credentials missing from environment variables!")
-
-    # 3 distinct open-source generation models
-    image_models = ["flux", "turbo", "realism"]
-
-    for item in drafts:
-        num = item["option_num"]
-        label = item["label"]
-        print(f"\n[LOG] Processing Option {num}: {label}", flush=True)
-        
-        encoded_prompt = urllib.parse.quote(item["image_prompt"])
-        
-        # 1. Send the 3 image variations
-        for model_name in image_models:
-            seed = random.randint(1, 999999)
-            image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?model={model_name}&width=1200&height=800&nologo=true&seed={seed}"
-            
-            caption = f"🎨 *OPTION {num} — IMAGE ({model_name.upper()})*\n\n*Prompt:* _{item['image_prompt']}_"
-            print(f"[LOG] Dispatching image from model: {model_name.upper()}", flush=True)
-            send_telegram_photo(bot_token, chat_id, image_url, caption)
-            time.sleep(2)
-
-        # 2. Send the article text safely chunked
-        print(f"[LOG] Dispatching text for Option {num}...", flush=True)
-        
-        # Clean article text ready for copy-pasting directly into Medium
-        article_text = f"**{item['title']}**\n\n{item['body']}"
-        send_telegram_text_chunks(bot_token, chat_id, article_text)
-        time.sleep(2)
