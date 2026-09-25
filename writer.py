@@ -1,5 +1,5 @@
-from google import genai
 from groq import Groq
+from google import genai
 import os
 import time
 import re
@@ -40,54 +40,80 @@ CRITICAL RULES:
 3. Format your output strictly as a numbered list with the raw prompts ONLY.
 """
 
-def call_llm(prompt, task_name):
-    try:
-        client = genai.Client()
-        for _ in range(2):
-            try:
-                res = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
-                if res.text: return res.text.strip(), "Google Gemini (gemini-3.6-flash)"
-            except:
-                time.sleep(4)
-    except:
-        pass
-        
-    try:
-        groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-        available_models = groq_client.models.list().data
-        text_models = [m.id for m in available_models if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
-        
-        if text_models:
-            res = groq_client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
-                model=text_models[0],
-            )
-            if res.choices: return res.choices[0].message.content.strip(), f"Groq ({text_models[0]})"
-    except:
-        pass
-        
-    return None, "FAILED ALL MODELS"
-
 def generate_curated_draft(topic):
     print(f"\n--- DRAFTING SINGLE VIRAL ARTICLE ---", flush=True)
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    groq_client = Groq(api_key=groq_api_key)
     
     article_prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth and structural threat model hidden behind this headline."
-    article_text, text_model = call_llm(article_prompt, "Article Generation")
-    print(f"[ENGINE LOG] Article generated using: {text_model}", flush=True)
     
+    article_text = None
+    text_model_used = None
+    
+    # 1. Try Groq for Article Generation
+    try:
+        available_models = groq_client.models.list().data
+        text_models = [m.id for m in available_models if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
+        if text_models:
+            text_model_used = text_models[0]
+            print(f"[LOG] Calling Groq API ({text_model_used}) for Article...", flush=True)
+            res = groq_client.chat.completions.create(
+                messages=[{"role": "user", "content": article_prompt}],
+                model=text_model_used,
+            )
+            article_text = res.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"[ERROR] Groq text generation failed: {e}", flush=True)
+        
+    # 2. Fallback to Gemini if Groq fails
     if not article_text:
-        raise Exception("CRITICAL ERROR: Failed to generate article across all providers.")
+        print("[WARN] Falling back to Gemini for article generation...", flush=True)
+        try:
+            client = genai.Client()
+            res = client.models.generate_content(model='gemini-3.6-flash', contents=article_prompt)
+            article_text = res.text.strip()
+            text_model_used = "Google Gemini (gemini-3.6-flash)"
+        except Exception as e:
+            raise Exception(f"CRITICAL ERROR: Failed to generate article across all providers. {e}")
 
+    print(f"[ENGINE LOG] Article generated using: {text_model_used}", flush=True)
+    
     lines = article_text.split('\n')
     title = lines[0].replace('#', '').strip()
     body = '\n'.join(lines[1:]).strip()
     
+    # Let the API rate limits cool down
     print("\n[LOG] Pausing for 15 seconds to respect AI API rate limits...", flush=True)
     time.sleep(15)
     
     image_prompt_request = f"{ART_DIRECTOR_PROMPT}\n\n[ARTICLE TEXT]:\nTitle: {title}\n{body[:1200]}"
-    image_prompts_text, img_model = call_llm(image_prompt_request, "Image Prompt Generation")
-    print(f"[ENGINE LOG] Image prompts engineered using: {img_model}", flush=True)
+    image_prompts_text = None
+    img_model_used = None
+    
+    # 3. Try Groq for Image Prompts
+    try:
+        if text_model_used and "Groq" in text_model_used:
+            print(f"[LOG] Calling Groq API ({text_model_used}) for Image Prompts...", flush=True)
+            res = groq_client.chat.completions.create(
+                messages=[{"role": "user", "content": image_prompt_request}],
+                model=text_model_used,
+            )
+            image_prompts_text = res.choices[0].message.content.strip()
+            img_model_used = f"Groq ({text_model_used})"
+    except Exception as e:
+        print(f"[ERROR] Groq failed for image prompts: {e}", flush=True)
+        
+    # 4. Fallback to Gemini for Image Prompts
+    if not image_prompts_text:
+        try:
+            client = genai.Client()
+            res = client.models.generate_content(model='gemini-3.6-flash', contents=image_prompt_request)
+            image_prompts_text = res.text.strip()
+            img_model_used = "Google Gemini (gemini-3.6-flash)"
+        except Exception as e:
+            print(f"[ERROR] Gemini failed for image prompts: {e}", flush=True)
+            
+    print(f"[ENGINE LOG] Image prompts engineered using: {img_model_used}", flush=True)
     
     image_prompts = []
     if image_prompts_text:
@@ -95,6 +121,7 @@ def generate_curated_draft(topic):
         if matches:
             image_prompts = [m.strip() for m in matches[:3]]
     
+    # Failsafe if regex misses
     while len(image_prompts) < 3:
         image_prompts.append(f"Cinematic tech editorial illustration representing {title}, high end corporate cyber, abstract, no text, highly detailed.")
 
