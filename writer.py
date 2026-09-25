@@ -2,6 +2,7 @@ from google import genai
 from groq import Groq
 import os
 import time
+import re
 
 VIRAL_SYSTEM_PERSONA = """
 You are an elite, viral tech essayist with the unspoken instincts of a 14-year veteran in enterprise cybersecurity and systems architecture.
@@ -13,15 +14,19 @@ VIRAL MEDIUM FORMULA (STRICT RULES):
 4. Voice: Skeptical, conversational, and direct. Expose the gap between PR/vendor theater and ground-level reality.
 5. Banned AI Words: NEVER use "delve", "tapestry", "beacon", "game-changer", "testament", "crucial", "vital", or "in conclusion".
 
-FORMATTING - READ CAREFULLY:
-- Do NOT use markdown headers like `#` or `##` anywhere in the text.
-- To create a subheading, simply write the text and wrap it in double asterisks like this: **The Silent Threat**
-- Line 1 must be the Title, wrapped in double asterisks: **Title Goes Here**
+FORMATTING & BOLDING - CRITICAL:
+- You MUST use HTML <b> tags for all bolding.
+- Line 1 must be a highly catchy, tension-filled Title wrapped in <b> tags: <b>Catchy Title Here</b>
+- Subheadings must be punchy, intriguing, and wrapped in <b> tags: <b>The Silent Threat</b>
+- Skimmability: You MUST wrap 1 or 2 important keywords or punchlines in EVERY paragraph in <b> tags to make the best points pop out.
+
+TAGS:
+At the very end of your response, on a new line, write exactly the phrase "===TAGS===" followed by 5 highly relevant Medium hashtags separated by spaces.
 """
 
 def generate_article(topic):
     print(f"\n[LOG] Drafting article for: {topic[:50]}...", flush=True)
-    prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth and structural threat model hidden behind this headline. Make the title insanely catchy."
+    prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth hidden behind this headline. Make it viral."
     
     article_text = None
     model_used = None
@@ -50,7 +55,6 @@ def generate_article(topic):
                 available = groq_client.models.list().data
                 text_models = [m.id for m in available if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
                 
-                # Prioritize Llama, Mixtral, Qwen, Gemma
                 priority = [m for m in text_models if any(x in m.lower() for x in ["llama", "qwen", "mixtral", "gemma"])]
                 models_to_try = priority + [m for m in text_models if m not in priority]
                 
@@ -74,8 +78,16 @@ def generate_article(topic):
 
     print(f"[SUCCESS] Article generated using: {model_used}", flush=True)
     
-    lines = article_text.split('\n')
-    title = lines[0].replace('#', '').strip()
+    # Split the tags from the main body
+    parts = article_text.split("===TAGS===")
+    raw_body = parts[0].strip()
+    tags = parts[1].strip() if len(parts) > 1 else "#TechNews #CyberSecurity #Innovation #SoftwareEngineering #TechTrends"
+    
+    # Extract Title and strip its tags for Telegram delivery separation
+    lines = raw_body.split('\n')
+    title = lines[0].replace('<b>', '').replace('</b>', '').replace('#', '').replace('*', '').strip()
+    
+    # Keep the rest of the body with its <b> tags intact
     body = '\n'.join(lines[1:]).strip()
     
-    return title, body
+    return title, body, tags
