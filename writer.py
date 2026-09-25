@@ -43,38 +43,56 @@ CRITICAL RULES:
 def generate_curated_draft(topic):
     print(f"\n--- DRAFTING SINGLE VIRAL ARTICLE ---", flush=True)
     groq_api_key = os.environ.get("GROQ_API_KEY")
-    groq_client = Groq(api_key=groq_api_key)
+    groq_client = Groq(api_key=groq_api_key) if groq_api_key else None
     
     article_prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth and structural threat model hidden behind this headline."
     
     article_text = None
     text_model_used = None
     
-    # 1. Try Groq for Article Generation
-    try:
-        available_models = groq_client.models.list().data
-        text_models = [m.id for m in available_models if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
-        if text_models:
-            text_model_used = text_models[0]
-            print(f"[LOG] Calling Groq API ({text_model_used}) for Article...", flush=True)
-            res = groq_client.chat.completions.create(
-                messages=[{"role": "user", "content": article_prompt}],
-                model=text_model_used,
-            )
-            article_text = res.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"[ERROR] Groq text generation failed: {e}", flush=True)
+    # 1. Try Groq (with a prioritized list of reliable models)
+    if groq_client:
+        groq_models_to_try = [
+            "llama-3.3-70b-versatile", 
+            "llama-3.1-8b-instant", 
+            "mixtral-8x7b-32768", 
+            "gemma2-9b-it"
+        ]
         
+        for model_id in groq_models_to_try:
+            try:
+                print(f"[LOG] Calling Groq API ({model_id}) for Article...", flush=True)
+                res = groq_client.chat.completions.create(
+                    messages=[{"role": "user", "content": article_prompt}],
+                    model=model_id,
+                )
+                article_text = res.choices[0].message.content.strip()
+                text_model_used = f"Groq ({model_id})"
+                break  # Success, exit the fallback loop
+            except Exception as e:
+                print(f"[WARN] Groq model {model_id} failed: {e}", flush=True)
+                continue
+
     # 2. Fallback to Gemini if Groq fails
     if not article_text:
         print("[WARN] Falling back to Gemini for article generation...", flush=True)
-        try:
-            client = genai.Client()
-            res = client.models.generate_content(model='gemini-3.6-flash', contents=article_prompt)
-            article_text = res.text.strip()
-            text_model_used = "Google Gemini (gemini-3.6-flash)"
-        except Exception as e:
-            raise Exception(f"CRITICAL ERROR: Failed to generate article across all providers. {e}")
+        client = genai.Client()
+        for attempt in range(5):
+            try:
+                res = client.models.generate_content(model='gemini-3.6-flash', contents=article_prompt)
+                article_text = res.text.strip()
+                text_model_used = "Google Gemini (gemini-3.6-flash)"
+                break
+            except Exception as e:
+                if "503" in str(e) or "429" in str(e) or "500" in str(e):
+                    print(f"[WARN] Gemini server busy. Retrying in 15 seconds (Attempt {attempt+1}/5)...", flush=True)
+                    time.sleep(15)
+                else:
+                    print(f"[ERROR] Gemini text generation failed: {e}", flush=True)
+                    break
+                    
+        if not article_text:
+            raise Exception("CRITICAL ERROR: Failed to generate article across all providers.")
 
     print(f"[ENGINE LOG] Article generated using: {text_model_used}", flush=True)
     
@@ -82,7 +100,7 @@ def generate_curated_draft(topic):
     title = lines[0].replace('#', '').strip()
     body = '\n'.join(lines[1:]).strip()
     
-    # Let the API rate limits cool down
+    # Pause to let API rate limits cool down
     print("\n[LOG] Pausing for 15 seconds to respect AI API rate limits...", flush=True)
     time.sleep(15)
     
@@ -91,27 +109,38 @@ def generate_curated_draft(topic):
     img_model_used = None
     
     # 3. Try Groq for Image Prompts
-    try:
-        if text_model_used and "Groq" in text_model_used:
-            print(f"[LOG] Calling Groq API ({text_model_used}) for Image Prompts...", flush=True)
-            res = groq_client.chat.completions.create(
-                messages=[{"role": "user", "content": image_prompt_request}],
-                model=text_model_used,
-            )
-            image_prompts_text = res.choices[0].message.content.strip()
-            img_model_used = f"Groq ({text_model_used})"
-    except Exception as e:
-        print(f"[ERROR] Groq failed for image prompts: {e}", flush=True)
+    if groq_client:
+        for model_id in groq_models_to_try:
+            try:
+                print(f"[LOG] Calling Groq API ({model_id}) for Image Prompts...", flush=True)
+                res = groq_client.chat.completions.create(
+                    messages=[{"role": "user", "content": image_prompt_request}],
+                    model=model_id,
+                )
+                image_prompts_text = res.choices[0].message.content.strip()
+                img_model_used = f"Groq ({model_id})"
+                break
+            except Exception as e:
+                print(f"[WARN] Groq model {model_id} failed for image prompts: {e}", flush=True)
+                continue
         
     # 4. Fallback to Gemini for Image Prompts
     if not image_prompts_text:
-        try:
-            client = genai.Client()
-            res = client.models.generate_content(model='gemini-3.6-flash', contents=image_prompt_request)
-            image_prompts_text = res.text.strip()
-            img_model_used = "Google Gemini (gemini-3.6-flash)"
-        except Exception as e:
-            print(f"[ERROR] Gemini failed for image prompts: {e}", flush=True)
+        print("[WARN] Falling back to Gemini for image prompts...", flush=True)
+        client = genai.Client()
+        for attempt in range(5):
+            try:
+                res = client.models.generate_content(model='gemini-3.6-flash', contents=image_prompt_request)
+                image_prompts_text = res.text.strip()
+                img_model_used = "Google Gemini (gemini-3.6-flash)"
+                break
+            except Exception as e:
+                if "503" in str(e) or "429" in str(e) or "500" in str(e):
+                    print(f"[WARN] Gemini server busy. Retrying in 15 seconds (Attempt {attempt+1}/5)...", flush=True)
+                    time.sleep(15)
+                else:
+                    print(f"[ERROR] Gemini prompt generation failed: {e}", flush=True)
+                    break
             
     print(f"[ENGINE LOG] Image prompts engineered using: {img_model_used}", flush=True)
     
