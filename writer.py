@@ -40,6 +40,64 @@ CRITICAL RULES:
 3. Format your output strictly as a numbered list with the raw prompts ONLY.
 """
 
+def call_groq_safely(groq_client, prompt, task_name):
+    """Dynamically fetches all available Groq models, prioritizes flagship ones, and tests until one works."""
+    try:
+        available = groq_client.models.list().data
+        text_models = [m.id for m in available if "whisper" not in m.id.lower() and "guard" not in m.id.lower()]
+        
+        # Prioritize flagship AI families over experimental 3rd-party models
+        priority = []
+        others = []
+        for m in text_models:
+            m_lower = m.lower()
+            if "llama" in m_lower or "qwen" in m_lower or "mixtral" in m_lower or "gemma" in m_lower:
+                priority.append(m)
+            else:
+                others.append(m)
+                
+        models_to_try = priority + others
+        
+        for model_id in models_to_try:
+            try:
+                print(f"[LOG] Calling Groq API ({model_id}) for {task_name}...", flush=True)
+                res = groq_client.chat.completions.create(
+                    messages=[{"role": "user", "content": prompt}],
+                    model=model_id,
+                )
+                return res.choices[0].message.content.strip(), f"Groq ({model_id})"
+            except Exception as e:
+                # Catch 400s/404s cleanly and move instantly to the next model
+                err_msg = str(e).split('\n')[0]
+                print(f"[WARN] Groq model '{model_id}' bypassed: {err_msg}", flush=True)
+                continue
+    except Exception as e:
+        print(f"[ERROR] Groq routing failed entirely: {e}", flush=True)
+        
+    return None, None
+
+def call_gemini_safely(prompt, task_name):
+    """Calls Gemini with extreme patience for high-traffic 503 spikes."""
+    print(f"[WARN] Falling back to Gemini for {task_name}...", flush=True)
+    client = genai.Client()
+    max_retries = 10
+    
+    for attempt in range(max_retries):
+        try:
+            res = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
+            if res.text:
+                return res.text.strip(), "Google Gemini (gemini-3.6-flash)"
+        except Exception as e:
+            err_msg = str(e).split('\n')[0]
+            if "503" in str(e) or "429" in str(e) or "500" in str(e):
+                print(f"[WARN] Gemini server busy (Attempt {attempt+1}/{max_retries}). Retrying in 20s...", flush=True)
+                time.sleep(20)
+            else:
+                print(f"[ERROR] Gemini {task_name} failed: {err_msg}", flush=True)
+                break
+                
+    return None, None
+
 def generate_curated_draft(topic):
     print(f"\n--- DRAFTING SINGLE VIRAL ARTICLE ---", flush=True)
     groq_api_key = os.environ.get("GROQ_API_KEY")
@@ -47,52 +105,18 @@ def generate_curated_draft(topic):
     
     article_prompt = f"{VIRAL_SYSTEM_PERSONA}\n\nTopic: {topic}\nSpecific Angle: Give me the uncomfortable operational truth and structural threat model hidden behind this headline."
     
-    article_text = None
-    text_model_used = None
+    article_text, text_model_used = None, None
     
-    # 1. Try Groq (with a prioritized list of reliable models)
+    # 1. Try Groq Dynamic Search
     if groq_client:
-        groq_models_to_try = [
-            "llama-3.3-70b-versatile", 
-            "llama-3.1-8b-instant", 
-            "mixtral-8x7b-32768", 
-            "gemma2-9b-it"
-        ]
+        article_text, text_model_used = call_groq_safely(groq_client, article_prompt, "Article")
         
-        for model_id in groq_models_to_try:
-            try:
-                print(f"[LOG] Calling Groq API ({model_id}) for Article...", flush=True)
-                res = groq_client.chat.completions.create(
-                    messages=[{"role": "user", "content": article_prompt}],
-                    model=model_id,
-                )
-                article_text = res.choices[0].message.content.strip()
-                text_model_used = f"Groq ({model_id})"
-                break  # Success, exit the fallback loop
-            except Exception as e:
-                print(f"[WARN] Groq model {model_id} failed: {e}", flush=True)
-                continue
-
-    # 2. Fallback to Gemini if Groq fails
+    # 2. Try Gemini Deep-Retry
     if not article_text:
-        print("[WARN] Falling back to Gemini for article generation...", flush=True)
-        client = genai.Client()
-        for attempt in range(5):
-            try:
-                res = client.models.generate_content(model='gemini-3.6-flash', contents=article_prompt)
-                article_text = res.text.strip()
-                text_model_used = "Google Gemini (gemini-3.6-flash)"
-                break
-            except Exception as e:
-                if "503" in str(e) or "429" in str(e) or "500" in str(e):
-                    print(f"[WARN] Gemini server busy. Retrying in 15 seconds (Attempt {attempt+1}/5)...", flush=True)
-                    time.sleep(15)
-                else:
-                    print(f"[ERROR] Gemini text generation failed: {e}", flush=True)
-                    break
-                    
-        if not article_text:
-            raise Exception("CRITICAL ERROR: Failed to generate article across all providers.")
+        article_text, text_model_used = call_gemini_safely(article_prompt, "Article")
+        
+    if not article_text:
+        raise Exception("CRITICAL ERROR: Failed to generate article across all providers.")
 
     print(f"[ENGINE LOG] Article generated using: {text_model_used}", flush=True)
     
@@ -100,47 +124,20 @@ def generate_curated_draft(topic):
     title = lines[0].replace('#', '').strip()
     body = '\n'.join(lines[1:]).strip()
     
-    # Pause to let API rate limits cool down
+    # Let rate limit buckets reset
     print("\n[LOG] Pausing for 15 seconds to respect AI API rate limits...", flush=True)
     time.sleep(15)
     
     image_prompt_request = f"{ART_DIRECTOR_PROMPT}\n\n[ARTICLE TEXT]:\nTitle: {title}\n{body[:1200]}"
-    image_prompts_text = None
-    img_model_used = None
+    image_prompts_text, img_model_used = None, None
     
-    # 3. Try Groq for Image Prompts
+    # 3. Try Groq Dynamic Search for Prompts
     if groq_client:
-        for model_id in groq_models_to_try:
-            try:
-                print(f"[LOG] Calling Groq API ({model_id}) for Image Prompts...", flush=True)
-                res = groq_client.chat.completions.create(
-                    messages=[{"role": "user", "content": image_prompt_request}],
-                    model=model_id,
-                )
-                image_prompts_text = res.choices[0].message.content.strip()
-                img_model_used = f"Groq ({model_id})"
-                break
-            except Exception as e:
-                print(f"[WARN] Groq model {model_id} failed for image prompts: {e}", flush=True)
-                continue
+        image_prompts_text, img_model_used = call_groq_safely(groq_client, image_prompt_request, "Image Prompts")
         
-    # 4. Fallback to Gemini for Image Prompts
+    # 4. Try Gemini Deep-Retry for Prompts
     if not image_prompts_text:
-        print("[WARN] Falling back to Gemini for image prompts...", flush=True)
-        client = genai.Client()
-        for attempt in range(5):
-            try:
-                res = client.models.generate_content(model='gemini-3.6-flash', contents=image_prompt_request)
-                image_prompts_text = res.text.strip()
-                img_model_used = "Google Gemini (gemini-3.6-flash)"
-                break
-            except Exception as e:
-                if "503" in str(e) or "429" in str(e) or "500" in str(e):
-                    print(f"[WARN] Gemini server busy. Retrying in 15 seconds (Attempt {attempt+1}/5)...", flush=True)
-                    time.sleep(15)
-                else:
-                    print(f"[ERROR] Gemini prompt generation failed: {e}", flush=True)
-                    break
+        image_prompts_text, img_model_used = call_gemini_safely(image_prompt_request, "Image Prompts")
             
     print(f"[ENGINE LOG] Image prompts engineered using: {img_model_used}", flush=True)
     
