@@ -14,9 +14,11 @@ def main():
     selected_topic = wait_for_user_selection(topics)
     print(f"\n[LOG] PROCEEDING WITH TOPIC: {selected_topic}\n", flush=True)
     
-    title, body = generate_article(selected_topic)
+    # Now unpacking 3 items: Title, Body, and Tags
+    title, body, tags = generate_article(selected_topic)
 
-    push_article_to_telegram(title, body)
+    # Push all 3 items to Telegram
+    push_article_to_telegram(title, body, tags)
     
     print("\n" + "="*50, flush=True)
     print("[SYSTEM LOG] PIPELINE SUCCESSFULLY COMPLETED", flush=True)
