@@ -128,7 +128,12 @@ def generate_outline(
                 thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
-        data = extract_json(resp.text or "")
+        try:
+            data = extract_json(resp.text or "")
+        except (ValueError, Exception) as exc:
+            logger.warning("Outline attempt %d returned invalid JSON (%s); retrying.", attempt, exc)
+            feedback = "PREVIOUS OUTPUT WAS NOT VALID JSON. Return ONLY a valid JSON object."
+            continue
         title = str(data.get("title", "")).strip()
         subtitle = str(data.get("subtitle", "")).strip()
         hook = str(data.get("hook", "")).strip()

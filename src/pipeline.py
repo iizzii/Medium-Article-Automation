@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from google import genai
+from google.genai import types
 
 from src.config_loader import REPO_ROOT, setup_logging
 from src.headings import generate_outline
@@ -83,7 +84,12 @@ def run_pipeline(
         write_step_summary(f"## Skipped ({date_str})\nArticle already published today.")
         return {"status": "skipped", "date": date_str}
 
-    gemini_client = client or genai.Client()
+    gemini_client = client or genai.Client(
+        http_options=types.HttpOptions(
+            timeout=60_000,
+            retry_options=types.HttpRetryOptions(attempts=1),
+        )
+    )
 
     # Stage 1–3: Topic -> Outline -> Writer + Grounding + Text Critic (retry new topic if quality fails)
     proposal = None
