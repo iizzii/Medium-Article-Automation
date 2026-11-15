@@ -1,118 +1,122 @@
-# Content pillars for a Security Engineering Lead writing for practitioners
+# Content pillars focused on Mobile (Android & iOS) Pentesting, Mobile Malware Analysis, and AI Security
 pillars:
-  - id: abuse_fraud_detection
-    name: Abuse & Fraud Detection at Scale
+  - id: android_pentesting
+    name: Android App Pentesting & Reverse Engineering
     description: >
-      Rule engines, scoring systems, entity clustering, signal engineering,
-      adversarial adaptation, rule decay, and abandonment criteria.
+      Practical Android security testing: APK/AAB decompilation, exported components
+      (Activities, Services, ContentProviders, BroadcastReceivers), Deep Links, WebViews,
+      SSL pinning, Frida hooking, and Keystore/biometric security.
     seed_themes:
-      - rule half-life and signal decay in production
-      - adversarial adaptation against velocity and graph features
-      - EDR/detector bypass mechanics and telemetry blind spots
-      - clustering coordinated abuse rings without drowning in false merges
+      - exploiting exported Android components and insecure Intent/DeepLink handling
+      - bypassing SSL pinning and root detection with Frida in modern Android apps
+      - WebView JavaScriptInterface and file-access pitfalls in hybrid apps
+      - auditing Android Keystore, BiometricPrompt, and local storage safely
     tags:
-      - Fraud Detection
-      - Abuse Prevention
-      - Security Engineering
-      - Signal Engineering
-      - Trust And Safety
-
-  - id: security_automation_soar
-    name: Security Automation & SOAR
-    description: >
-      Auto-triage gates, precision-recall trade-offs, human-in-the-loop design,
-      and measuring automation quality against analyst verdicts.
-    seed_themes:
-      - setting auto-close precision thresholds vs queue capacity
-      - out-of-band patches or automated containment breaking production
-      - shadow mode evaluation before enabling auto-remediation
-      - measuring SOAR playbook drift against senior analyst verdicts
-    tags:
-      - Security Automation
-      - SOAR
-      - SecOps
-      - Incident Response
+      - Android Security
+      - Mobile Pentesting
+      - Frida
+      - Reverse Engineering
       - Cybersecurity
 
-  - id: detection_engineering
-    name: Detection Engineering
+  - id: ios_pentesting
+    name: iOS App Pentesting & Runtime Analysis
     description: >
-      Writing, testing, backfilling, and retiring rules; false-positive economics
-      and alert fatigue math.
+      Hands-on iOS security assessment: IPA structure, Mach-O binaries, Keychain
+      accessibility classes, Universal Links, URL schemes, Swift/Obj-C runtime hooking,
+      and ATS/TLS pinning checks.
     seed_themes:
-      - false-positive economics and analyst cost per alert
-      - backfilling detection rules over historical telemetry
-      - retiring dead or noisy rules safely
-      - kernel-level and supply-chain telemetry gaps
+      - auditing iOS Keychain items and Data Protection classes in real apps
+      - Universal Links vs custom URL schemes security pitfalls
+      - hooking Swift and Objective-C methods with Frida on jailbroken and non-jailbroken devices
+      - local authentication, FaceID/TouchID, and plist/cache data leakage
     tags:
-      - Detection Engineering
-      - Threat Detection
-      - Blue Team
+      - iOS Security
+      - Mobile Pentesting
+      - AppSec
+      - Reverse Engineering
       - Cybersecurity
+
+  - id: mobile_malware_analysis
+    name: Mobile Malware Analysis & Threat Hunting
+    description: >
+      Analyzing Android and iOS malware families, Accessibility Service abuse,
+      dynamic DEX/payload loading, malicious SDKs, stalkerware, and mobile C2 traffic.
+    seed_themes:
+      - how Android banking trojans abuse Accessibility Services and overlay attacks
+      - unpacking dynamically loaded DEX payloads and obfuscated droppers
+      - detecting malicious ad/analytics SDKs and supply-chain trojans in mobile apps
+      - analyzing mobile C2 protocols and certificate-pinned malware traffic
+    tags:
+      - Malware Analysis
+      - Mobile Security
+      - Android Malware
+      - Threat Intelligence
       - InfoSec
 
-  - id: compliance_audit_automation
-    name: Compliance & Audit Automation
+  - id: mobile_ai_security
+    name: Applied AI for Mobile Security & App Triage
     description: >
-      Reconciliation pipelines, evidence integrity, catching missing records,
-      and deterministic ID pattern matching.
+      Using LLMs and ML for mobile app triage, APK/IPA static analysis, on-device
+      AI model security (TFLite/CoreML), and prompt-injection risks in mobile AI features.
     seed_themes:
-      - automated evidence reconciliation across heterogeneous logs
-      - catching silent drops and missing audit records
-      - cryptographic integrity checks for compliance artifacts
-      - deterministic ID pattern matching without regex catastrophic backtracking
-    tags:
-      - Compliance Automation
-      - Security Engineering
-      - Audit
-      - DevSecOps
-      - Data Integrity
-
-  - id: ops_tooling_engineering
-    name: Ops Tooling Engineering
-    description: >
-      Apps Script / Sheets as production tools, SLA notifiers, queue routing,
-      workload-balancing algorithms, and building internal consoles.
-    seed_themes:
-      - treating spreadsheets and lightweight scripts as real production systems
-      - SLA breach prediction and escalation routing
-      - weighted round-robin and skill-based queue balancing
-      - building internal triage consoles with audit trails
-    tags:
-      - Security Operations
-      - Internal Tools
-      - Automation
-      - Engineering
-      - Queue Management
-
-  - id: applied_ai_security
-    name: Applied AI for Security
-    description: >
-      LLM triage, eval design, prompt-injection defense, and agentic SOC workflows.
-    seed_themes:
-      - designing offline evals for LLM alert triage before production rollout
-      - defending agentic SOC pipelines against indirect prompt injection
-      - structured output validation and deterministic guardrails around LLMs
-      - cost and latency budgets for AI-assisted investigation
+      - using LLMs to triage decompiled Android/iOS code without hallucinating vulnerabilities
+      - extracting and auditing on-device TFLite and CoreML models from mobile binaries
+      - prompt injection and insecure tool use in mobile AI assistants
+      - designing practical evals for AI-assisted mobile malware classification
     tags:
       - AI Security
+      - Mobile Security
       - LLM
-      - Security Operations
+      - AppSec
       - Machine Learning
-      - Prompt Injection
 
-  - id: leading_security_teams
-    name: Leading Security Teams
+  - id: mobile_security_automation
+    name: Mobile Security Automation & MASVS Pipelines
     description: >
-      QA rotations, reviewer throughput, calibration, and operational runbooks.
+      Automating mobile security checks in CI/CD: MobSF/jadx/apkleaks workflows,
+      OWASP MASVS/MASTG verification, and reducing false positives for mobile devs.
     seed_themes:
-      - running blind QA calibration across review analysts
-      - measuring reviewer throughput without incentivizing rubber-stamping
-      - writing runbooks that survive 3 AM incidents
-      - structuring on-call and QA rotations to prevent burnout
+      - automating OWASP MASVS checks in CI/CD without slowing down mobile releases
+      - building lightweight Python scanners for AndroidManifest.xml and Info.plist bugs
+      - triaging noisy static mobile scanner findings with automated reachability checks
+      - automating APK/IPA diffing across app store releases
     tags:
+      - Mobile AppSec
+      - Security Automation
+      - OWASP MASVS
+      - DevSecOps
+      - Cybersecurity
+
+  - id: mobile_fraud_abuse
+    name: Mobile Fraud, Bot Abuse & App Integrity
+    description: >
+      Defending mobile backends against emulators, device farms, Frida tampering,
+      Play Integrity / App Attest bypasses, and automated credential/API abuse.
+    seed_themes:
+      - understanding Play Integrity and Apple App Attest—and where they fall short
+      - detecting emulators, hooking frameworks, and device farms in mobile telemetry
+      - securing mobile APIs against replay attacks and automated scraping
+      - balancing anti-tampering controls with legitimate user experience
+    tags:
+      - Fraud Detection
+      - Mobile Security
+      - App Integrity
+      - API Security
+      - Trust And Safety
+
+  - id: leading_mobile_security
+    name: Leading Mobile Security & AppSec Teams
+    description: >
+      Scoping mobile pentests, writing actionable bug reports for Android/iOS engineers,
+      calibration, and running effective mobile security programs.
+    seed_themes:
+      - writing mobile pentest findings that iOS and Android developers actually fix
+      - scoping a 5-day mobile app pentest using OWASP MASTG priorities
+      - triaging mobile bug bounty reports and filtering out low-impact scanner noise
+      - building developer-friendly secure storage and networking templates for mobile teams
+    tags:
+      - AppSec
+      - Mobile Security
+      - Penetration Testing
       - Engineering Leadership
       - Security Operations
-      - Management
-      - Trust And Safety
-      - Incident Management
