@@ -96,13 +96,18 @@ def extract_json(text: str) -> dict[str, Any]:
         cleaned = fence_match.group(1).strip()
 
     try:
-        parsed = json.loads(cleaned)
+        parsed = json.loads(cleaned, strict=False)
     except json.JSONDecodeError:
         start = cleaned.find("{")
         end = cleaned.rfind("}")
         if start == -1 or end == -1 or end <= start:
             raise
-        parsed = json.loads(cleaned[start : end + 1])
+        snippet = cleaned[start : end + 1]
+        try:
+            parsed = json.loads(snippet, strict=False)
+        except json.JSONDecodeError:
+            fixed = re.sub(r'\\(?!["\\/bfnrtu])', r"\\\\", snippet)
+            parsed = json.loads(fixed, strict=False)
 
     if not isinstance(parsed, dict):
         raise ValueError(f"Expected JSON object, got {type(parsed).__name__}")
