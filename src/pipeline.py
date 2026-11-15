@@ -86,7 +86,7 @@ def run_pipeline(
 
     gemini_client = client or genai.Client(
         http_options=types.HttpOptions(
-            timeout=60_000,
+            timeout=90_000,
             retry_options=types.HttpRetryOptions(attempts=1),
         )
     )

@@ -126,7 +126,7 @@ def call_with_retry(fn: Any, *args: Any, max_attempts: int = 5, **kwargs: Any) -
             return fn(*args, **kwargs)
         except Exception as exc:
             msg = str(exc)
-            if any(code in msg for code in ("503", "429", "404", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "NOT_FOUND")):
+            if any(code in msg for code in ("503", "504", "429", "404", "UNAVAILABLE", "DEADLINE_EXCEEDED", "RESOURCE_EXHAUSTED", "NOT_FOUND")):
                 last_exc = exc
                 if "model" in kwargs and fb_idx < len(fallbacks):
                     kwargs = dict(kwargs, model=fallbacks[fb_idx])
