@@ -109,9 +109,16 @@ def extract_json(text: str) -> dict[str, Any]:
     return parsed
 
 
-def call_with_retry(fn: Any, *args: Any, max_attempts: int = 3, **kwargs: Any) -> Any:
-    """Retry transient Gemini 503/429 errors and fall back to fallback_text model if needed."""
+def call_with_retry(fn: Any, *args: Any, max_attempts: int = 5, **kwargs: Any) -> Any:
+    """Retry transient Gemini 503/429 errors and rotate through fallback_models if needed."""
     import time
+
+    fallbacks: list[str] = []
+    try:
+        fallbacks = list(load_yaml("models.yaml")["models"].get("fallback_models", []))
+    except Exception:
+        pass
+    fb_idx = 0
 
     last_exc: Exception | None = None
     for attempt in range(1, max_attempts + 1):
@@ -119,16 +126,12 @@ def call_with_retry(fn: Any, *args: Any, max_attempts: int = 3, **kwargs: Any) -
             return fn(*args, **kwargs)
         except Exception as exc:
             msg = str(exc)
-            if any(code in msg for code in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED")):
+            if any(code in msg for code in ("503", "429", "404", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "NOT_FOUND")):
                 last_exc = exc
-                if attempt == 2 and "model" in kwargs:
-                    try:
-                        fb = load_yaml("models.yaml")["models"].get("fallback_text")
-                        if fb and kwargs["model"] != fb:
-                            kwargs = dict(kwargs, model=fb)
-                            continue
-                    except Exception:
-                        pass
+                if "model" in kwargs and fb_idx < len(fallbacks):
+                    kwargs = dict(kwargs, model=fallbacks[fb_idx])
+                    fb_idx += 1
+                    continue
                 if attempt < max_attempts:
                     time.sleep(2 * attempt)
                     continue
