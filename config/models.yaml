@@ -1,14 +1,14 @@
 # Gemini model configuration (never hardcode model names in Python source)
 models:
-  topic_selector: gemini-2.5-flash
-  outliner: gemini-2.5-flash
-  writer: gemini-2.5-pro
-  grounding: gemini-2.5-flash
-  text_critic: gemini-2.5-flash
-  visual_planner: gemini-2.5-flash
+  topic_selector: gemini-3.8-flash
+  outliner: gemini-3.8-flash
+  writer: gemini-3.8-flash
+  grounding: gemini-3.8-flash
+  text_critic: gemini-3.8-flash
+  visual_planner: gemini-3.8-flash
   image_generator: imagen-3.0-generate-002
-  image_critic: gemini-2.5-flash
-  embedding: text-embedding-004
+  image_critic: gemini-3.8-flash
+  embedding: gemini-embedding-001
 
 generation:
   temperature_topic: 0.9
