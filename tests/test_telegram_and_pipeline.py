@@ -247,7 +247,7 @@ def test_pipeline_sends_exactly_one_telegram_on_success(tmp_path: Path, monkeypa
 def test_pipeline_sends_zero_telegram_on_medium_failure(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "fake-bot-token")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "999999")
-    monkeypatch.delenv("MEDIUM_TOKEN", raising=False)
+    monkeypatch.setenv("MEDIUM_TOKEN", "fake-medium-token")
     monkeypatch.setenv("GITHUB_TOKEN", "gh-token")
     monkeypatch.setenv("GITHUB_REPOSITORY", "iizzii/Medium-Article-Automation")
 
@@ -264,12 +264,16 @@ def test_pipeline_sends_zero_telegram_on_medium_failure(tmp_path: Path, monkeypa
             return SimpleNamespace(status_code=201, json=lambda: {"html_url": "https://github.com/issue/1"})
         return SimpleNamespace(status_code=200, json=lambda: {})
 
+    def fake_medium_fail(method: str, url: str, **kwargs):
+        return SimpleNamespace(status_code=401, text="Unauthorized")
+
     hist_file = tmp_path / "history.json"
     client = _make_fake_gemini_client()
 
     with (
         patch("src.notify_telegram.requests.post", side_effect=fake_tg_post),
         patch("src.publisher_medium.requests.post", side_effect=fake_gh_post),
+        patch("src.publisher_medium.requests.request", side_effect=fake_medium_fail),
     ):
         res = run_pipeline(
             dry_run=False,
@@ -283,3 +287,37 @@ def test_pipeline_sends_zero_telegram_on_medium_failure(tmp_path: Path, monkeypa
     assert len(issue_calls) == 1
     assert issue_calls[0]["title"].startswith("Ready to import:")
     assert Path(res["output_file"]).exists()
+
+
+def test_pipeline_without_medium_token_exports_html_and_notifies_telegram(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "fake-bot-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "999999")
+    monkeypatch.delenv("MEDIUM_TOKEN", raising=False)
+    monkeypatch.setenv("GITHUB_TOKEN", "gh-token")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "iizzii/Medium-Article-Automation")
+
+    telegram_calls: list[str] = []
+
+    def fake_tg_post(url: str, **kwargs):
+        if "api.telegram.org" in url:
+            telegram_calls.append(url)
+            return SimpleNamespace(status_code=200, json=lambda: {"ok": True})
+        return SimpleNamespace(status_code=201, json=lambda: {"html_url": "https://github.com/issue/2"})
+
+    hist_file = tmp_path / "history.json"
+    client = _make_fake_gemini_client()
+
+    with (
+        patch("src.notify_telegram.requests.post", side_effect=fake_tg_post),
+        patch("src.publisher_medium.requests.post", side_effect=fake_tg_post),
+    ):
+        res = run_pipeline(
+            dry_run=False,
+            output_base_dir=tmp_path,
+            history_path=hist_file,
+            client=client,
+        )
+
+    assert res["status"] == "ready_to_import"
+    assert len(telegram_calls) == 1
+    assert Path(res["html_file"]).exists()

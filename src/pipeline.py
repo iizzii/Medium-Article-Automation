@@ -16,6 +16,7 @@ from google import genai
 
 from src.config_loader import REPO_ROOT, setup_logging
 from src.headings import generate_outline
+from src.html_export import export_article_html
 from src.image_critic import produce_visual_with_gate
 from src.notify_telegram import send_publish_notification
 from src.publisher_medium import (
@@ -160,7 +161,10 @@ def run_pipeline(
         }
 
     # Live publish path
+    has_medium_token = bool(os.environ.get("MEDIUM_TOKEN", "").strip())
     try:
+        if not has_medium_token:
+            raise MediumPublishError("MEDIUM_TOKEN is not configured.")
         uploaded_urls = {
             slot: upload_image_to_medium(p, date_str=date_str)
             for slot, p in produced_paths.items()
@@ -173,25 +177,79 @@ def run_pipeline(
             publish_status=publish_status,
         )
     except MediumPublishError as exc:
-        logger.error("Medium publish failed (%s); saving fallback markdown and opening GitHub Issue.", exc)
+        logger.warning("Medium API unavailable (%s); exporting Markdown + GitHub Pages HTML.", exc)
         fallback_urls = {
             slot: upload_image_to_medium(p, medium_token="", date_str=date_str)
             for slot, p in produced_paths.items()
         }
-        fallback_md = f"# {outline.title}\n\n*{outline.subtitle}*\n\n" + inject_images_into_markdown(
-            draft.markdown, briefs, fallback_urls
-        ) + AUTHOR_FOOTER
+        body_with_imgs = inject_images_into_markdown(draft.markdown, briefs, fallback_urls)
+        fallback_md = f"# {outline.title}\n\n*{outline.subtitle}*\n\n" + body_with_imgs + AUTHOR_FOOTER
         out_file = output_dir / f"{date_str}-{slug}.md"
         out_file.write_text(fallback_md, encoding="utf-8")
 
+        repo_slug = os.environ.get("GITHUB_REPOSITORY", "iizzii/Medium-Article-Automation")
+        owner, repo_name = (repo_slug.split("/", 1) + [""])[:2]
+        pages_url = f"https://{owner}.github.io/{repo_name}/articles/{date_str}-{slug}.html"
+        html_file = base_dir / "docs" / "articles" / f"{date_str}-{slug}.html"
+        export_article_html(
+            title=outline.title,
+            subtitle=outline.subtitle,
+            markdown_body=body_with_imgs + AUTHOR_FOOTER,
+            output_html_path=html_file,
+            cover_url=fallback_urls.get("cover", ""),
+        )
+
         issue_body = (
-            f"Medium publishing failed: `{exc}`\n\n"
+            f"Import URL (paste into https://medium.com/p/import): {pages_url}\n\n"
             f"- **Saved Markdown:** `{out_file}`\n"
+            f"- **Saved HTML:** `{html_file}`\n"
             f"- **Assets:** `{assets_dir}`\n"
             f"- **Tags:** {', '.join(outline.tags)}\n"
             f"- **Text Scores:** `{json.dumps(draft.scores)}`\n"
         )
         open_github_issue(f"Ready to import: {outline.title}", issue_body)
+
+        if not has_medium_token:
+            append_history(
+                HistoryEntry(
+                    date=date_str,
+                    title=outline.title,
+                    slug=slug,
+                    pillar=proposal.pillar,
+                    format=proposal.format,
+                    tags=outline.tags,
+                    url=pages_url,
+                    publish_status="ready_to_import",
+                    text_scores=draft.scores,
+                    image_scores=image_scores,
+                    embedding=proposal.embedding,
+                ),
+                path=hist_file,
+            )
+            send_publish_notification(
+                title=outline.title,
+                subtitle=f"{outline.subtitle}\nImport on Medium: https://medium.com/p/import",
+                medium_url=pages_url,
+                tags=outline.tags,
+                fmt=proposal.format,
+                pillar=proposal.pillar,
+                cover_path=produced_paths.get("cover"),
+            )
+            write_step_summary(
+                f"## Ready to Import on Medium: {outline.title}\n"
+                f"- **Rendered URL:** {pages_url}\n"
+                f"- **Medium Importer:** https://medium.com/p/import\n"
+                f"- **Tags:** {', '.join(outline.tags)}\n"
+                f"- **Text Scores:** `{json.dumps(draft.scores)}`\n"
+            )
+            return {
+                "status": "ready_to_import",
+                "title": outline.title,
+                "url": pages_url,
+                "output_file": str(out_file),
+                "html_file": str(html_file),
+            }
+
         write_step_summary(f"## Publish Fallback: {outline.title}\nError: `{exc}`\nSaved to `{out_file}`")
         return {"status": "fallback", "title": outline.title, "error": str(exc), "output_file": str(out_file)}
 

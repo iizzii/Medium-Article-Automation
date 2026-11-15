@@ -4,6 +4,7 @@ requests>=2.32.3
 pillow>=10.4.0
 matplotlib>=3.8.0
 pygments>=2.18.0
+markdown>=3.7
 numpy>=1.26.0
 ruff>=0.7.0
 mypy>=1.13.0
