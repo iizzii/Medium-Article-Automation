@@ -64,6 +64,7 @@ def critique_image(
             config=types.GenerateContentConfig(
                 temperature=0.1,
                 response_mime_type="application/json",
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
         data = extract_json(resp.text or "")

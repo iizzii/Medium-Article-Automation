@@ -84,7 +84,7 @@ jobs:
           if [ -n "${{ inputs.publish_status }}" ]; then
             ARGS+=(--publish-status "${{ inputs.publish_status }}")
           fi
-          python -m src.pipeline "${ARGS[@]}"
+          python -u -m src.pipeline "${ARGS[@]}"
 
       - name: Upload generated artifacts on dry run
         if: always() && inputs.dry_run == true

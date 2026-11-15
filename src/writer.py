@@ -96,6 +96,7 @@ def critique_article(
         config=types.GenerateContentConfig(
             temperature=temperature,
             response_mime_type="application/json",
+            thinking_config=types.ThinkingConfig(thinking_budget=0),
         ),
     )
     data = extract_json(resp.text or "")
@@ -153,7 +154,10 @@ def write_and_critique_article(
         resp = client.models.generate_content(
             model=writer_model,
             contents=prompt,
-            config=types.GenerateContentConfig(temperature=temp_writer),
+            config=types.GenerateContentConfig(
+                temperature=temp_writer,
+                thinking_config=types.ThinkingConfig(thinking_budget=1024),
+            ),
         )
         draft = (resp.text or "").strip()
         draft = verify_references_with_grounding(client, draft, grounding_model)
