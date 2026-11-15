@@ -55,7 +55,7 @@ def critique_image(
         resp = client.models.generate_content(
             model=critic_model,
             contents=[
-                prompt,
+                types.Part.from_text(text=prompt),
                 types.Part.from_bytes(data=img_bytes, mime_type=mime),
             ],
             config=types.GenerateContentConfig(
