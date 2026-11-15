@@ -10,7 +10,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from src.config_loader import extract_json, load_prompt, load_yaml
+from src.config_loader import call_with_retry, extract_json, load_prompt, load_yaml
 from src.topics import TopicProposal
 
 logger = logging.getLogger("medium_pipeline.headings")
@@ -118,7 +118,8 @@ def generate_outline(
     feedback = ""
     for attempt in range(1, max_attempts + 1):
         prompt = f"{base_prompt}\n\n{feedback}".strip()
-        resp = client.models.generate_content(
+        resp = call_with_retry(
+            client.models.generate_content,
             model=outliner_model,
             contents=prompt,
             config=types.GenerateContentConfig(

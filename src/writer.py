@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from google import genai
 from google.genai import types
 
-from src.config_loader import extract_json, load_prompt, load_yaml
+from src.config_loader import call_with_retry, extract_json, load_prompt, load_yaml
 from src.headings import ArticleOutline
 from src.topics import TopicProposal
 from src.validate import validate_python_code
@@ -151,7 +151,8 @@ def write_and_critique_article(
             feedback_section=feedback_section,
         )
 
-        resp = client.models.generate_content(
+        resp = call_with_retry(
+            client.models.generate_content,
             model=writer_model,
             contents=prompt,
             config=types.GenerateContentConfig(

@@ -9,7 +9,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from src.config_loader import extract_json, load_prompt, load_yaml
+from src.config_loader import call_with_retry, extract_json, load_prompt, load_yaml
 from src.state import choose_next_format, choose_next_pillar, cosine_similarity
 
 logger = logging.getLogger("medium_pipeline.topics")
@@ -98,7 +98,8 @@ def select_topic(
             rejected_angles_note=rejected_str,
         )
 
-        resp = client.models.generate_content(
+        resp = call_with_retry(
+            client.models.generate_content,
             model=topic_model,
             contents=prompt,
             config=types.GenerateContentConfig(

@@ -107,3 +107,23 @@ def extract_json(text: str) -> dict[str, Any]:
     if not isinstance(parsed, dict):
         raise ValueError(f"Expected JSON object, got {type(parsed).__name__}")
     return parsed
+
+
+def call_with_retry(fn: Any, *args: Any, max_attempts: int = 4, **kwargs: Any) -> Any:
+    """Retry transient Gemini 503/429 errors with short exponential backoff."""
+    import time
+
+    last_exc: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exc:
+            msg = str(exc)
+            if any(code in msg for code in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED")):
+                last_exc = exc
+                if attempt < max_attempts:
+                    time.sleep(2 * attempt)
+                    continue
+            raise
+    assert last_exc is not None
+    raise last_exc
