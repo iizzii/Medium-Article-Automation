@@ -52,11 +52,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install system tools (Graphviz, Chromium deps, fonts)
+      - name: Install system tools (Graphviz, fonts, Mermaid CLI)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq graphviz fonts-inter fonts-jetbrains-mono
-          npm install -g @mermaid-js/mermaid-cli
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install -g @mermaid-js/mermaid-cli
+          echo "PUPPETEER_EXECUTABLE_PATH=$(which google-chrome || which chromium-browser || true)" >> "$GITHUB_ENV"
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
