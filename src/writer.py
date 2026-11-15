@@ -90,7 +90,8 @@ def critique_article(
         pillar_name=proposal.pillar,
         article_markdown=markdown,
     )
-    resp = client.models.generate_content(
+    resp = call_with_retry(
+        client.models.generate_content,
         model=model_name,
         contents=prompt,
         config=types.GenerateContentConfig(

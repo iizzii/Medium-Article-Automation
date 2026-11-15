@@ -17,7 +17,7 @@ MANDATORY REQUIREMENTS:
 2. Start directly with a concrete hook (a realistic production scenario or a surprising number) — NO greeting, NO "In today's fast-paced world".
 3. Include a **TL;DR / Key Takeaways** block near the top (3–5 crisp bullets).
 4. Use the EXACT H2 headings from the outline (`## Heading`). Do not add vague headings like "Conclusion" or "Overview".
-5. Include >= 2 working Python code blocks fenced with ```python. All Python code MUST be valid syntax, use only Python stdlib (or standard numpy/matplotlib if needed), and self-contained snippets must run cleanly without network calls or external files. For WORKSHOP format, include a complete runnable script with sample output.
+5. Include >= 2 working Python code blocks fenced with ```python. All Python code MUST be valid syntax, use ONLY Python stdlib (`math`, `random`, `collections`, `dataclasses`, `hashlib`, `statistics`, `json`, `re` — NEVER import `scipy`, `networkx`, `pandas`, `sklearn`, or other third-party libraries), and self-contained snippets must run cleanly without network calls or external files. For WORKSHOP format, include a complete runnable script with sample output.
 6. Include >= 1 well-structured Markdown table with concrete numbers or decision thresholds.
 7. Include dedicated H2 or H3 subsections (using specific technical titles or clear sub-blocks) covering:
    - **Common pitfalls** (concrete failure modes)
