@@ -9,6 +9,7 @@ models:
   image_generator: imagen-3.0-generate-002
   image_critic: gemini-3.8-flash
   embedding: gemini-embedding-001
+  fallback_text: gemini-3.6-flash
 
 generation:
   temperature_topic: 0.9

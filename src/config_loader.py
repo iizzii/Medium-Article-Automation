@@ -109,8 +109,8 @@ def extract_json(text: str) -> dict[str, Any]:
     return parsed
 
 
-def call_with_retry(fn: Any, *args: Any, max_attempts: int = 4, **kwargs: Any) -> Any:
-    """Retry transient Gemini 503/429 errors with short exponential backoff."""
+def call_with_retry(fn: Any, *args: Any, max_attempts: int = 3, **kwargs: Any) -> Any:
+    """Retry transient Gemini 503/429 errors and fall back to fallback_text model if needed."""
     import time
 
     last_exc: Exception | None = None
@@ -121,6 +121,14 @@ def call_with_retry(fn: Any, *args: Any, max_attempts: int = 4, **kwargs: Any) -
             msg = str(exc)
             if any(code in msg for code in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED")):
                 last_exc = exc
+                if attempt == 2 and "model" in kwargs:
+                    try:
+                        fb = load_yaml("models.yaml")["models"].get("fallback_text")
+                        if fb and kwargs["model"] != fb:
+                            kwargs = dict(kwargs, model=fb)
+                            continue
+                    except Exception:
+                        pass
                 if attempt < max_attempts:
                     time.sleep(2 * attempt)
                     continue
