@@ -1,0 +1,349 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Defending Continuous-Time GNNs Against Structural Poisoning",
+    "core_technical_idea": "Ingestion-stream real-time topological pruning and dynamic edge-weight decay blocking dormant bridge nodes before memory module poisoning.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Ingestion stream",
+      "Localized structural density gradient evaluation",
+      "Dynamic edge-weight decay parameterized by velocity",
+      "Memory module isolation from dormant bridge nodes"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right processing pipeline showing raw transaction stream entering an active ingestion filter, splitting malicious dormant bridges via density checks, and passing clean structural memory to the CT-GNN.",
+    "alt_text": "Architectural diagram showing the interception of dormant bridge nodes via ingestion-stream structural density pruning before continuous-time GNN memory updates.",
+    "caption": "Filtering structural poison at the ingestion layer protects continuous-time GNN memory modules from synthetic coordination cascades.",
+    "mermaid_code": "flowchart TD\n    A[Transaction Ingestion Stream] --> B{Localized Density Gradient Check}\n    B -->|Low-Velocity Long-Duration Bridge| C[Real-Time Topological Pruning]\n    B -->|Organic High-Velocity Growth| D[Dynamic Edge-Weight Decay Module]\n    C --> E[Drop Synthetic Node]\n    D --> F[Update CT-GNN Memory Safely]\n    style A fill:#f9f,stroke:#333,stroke-width:2px\n    style C fill:#ff9999,stroke:#333,stroke-width:1px\n    style F fill:#99ff99,stroke:#333,stroke-width:1px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 7,
+      "brand_consistency": 6,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/cover.png"
+  },
+  {
+    "slot_id": "sec-01-anatomizing-adversarial-poisoning-via-do",
+    "is_cover": false,
+    "heading": "Anatomizing Adversarial Poisoning via Dormant Bridge Nodes",
+    "core_technical_idea": "The dual-phase progression of adversarial poisoning in CT-GNNs: slow multi-week memory infiltration via low-frequency transactions followed by a high-velocity exploitation phase utilizing accumulated structural authority.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Node A (Syndicate)",
+      "Node B (Dormant Bridge)",
+      "Node C / Merchant (Victim)",
+      "Phase 1 Dormancy timeline (Days 1 - 30)",
+      "Phase 2 Activation timeline (Day 31)",
+      "TGN Memory Module updates and velocity shifting"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom workflow mapping the transition from low-frequency evasion to high-velocity structural exploitation across a chronological timeline.",
+    "alt_text": "Architectural diagram mapping the two-phase adversarial poisoning attack on a Continuous-Time Graph Neural Network, showing micro-transfers during dormancy and sudden structural authority transfer during activation.",
+    "caption": "Phase-transition mechanics of dormant bridge nodes: bypassing velocity limits via temporal masking before weaponizing accumulated GNN memory.",
+    "mermaid_code": "flowchart TD\n    subgraph Phase1 [Phase 1: Dormancy Days 1 - 30]\n        NodeA[Node A: Syndicate] -- \"Low-Frequency (1 tx / 5 days)\" --> NodeB[Node B: Dormant Bridge]\n        NodeB --> TGN[TGN Memory Module: Gradual State Update]\n        style Phase1 fill:#f9f9f9,stroke:#333,stroke-width:1px\n    end\n\n    subgraph Phase2 [Phase 2: Activation Day 31]\n        NodeB2[Node B: Dormant Bridge] -- \"High-Velocity (500 tx / min)\" --> NodeC[Node C: Victim / Merchant]\n        TGN2[Propagated Structural Authority] --> NodeC\n        style Phase2 fill:#fff5f5,stroke:#c53030,stroke-width:1px\n    end\n\n    Phase1 --> Phase2\n\n    classDef nodeStyle fill:#e2e8f0,stroke:#475569,stroke-width:2px;\n    classDef victimStyle fill:#fed7d7,stroke:#9b2c2c,stroke-width:2px;\n    class NodeA,NodeB,NodeB2 nodeStyle;\n    class NodeC victimStyle;",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/sec-01-anatomizing-adversarial-poisoning-via-do.png"
+  },
+  {
+    "slot_id": "sec-02-formulating-dynamic-edge-weight-decay-vi",
+    "is_cover": false,
+    "heading": "Formulating Dynamic Edge-Weight Decay via Ephemeral Velocity",
+    "core_technical_idea": "Comparison of temporal signal decay models showing how dynamic ephemeral velocity decay aggressively drops dormant node weight while preserving high-density bursts.",
+    "visual_type": "chart",
+    "must_show": [
+      "Linear decay curve",
+      "Fixed exponential decay curve",
+      "Dynamic ephemeral velocity decay curve showing ultra-low dormant retention",
+      "Time elapsed (delta t) on x-axis",
+      "Effective temporal weight W(e, t) on y-axis"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Line chart featuring three distinct curves plotted over delta t from 0 to 600 units, highlighting the sharp drop of the dynamic decay model compared to linear and fixed exponential.",
+    "alt_text": "A line chart comparing Linear, Fixed Exponential, and Dynamic Ephemeral Velocity decay models, illustrating how dynamic decay drops weight near zero for dormant nodes.",
+    "caption": "Dynamic ephemeral velocity decay accelerates historical pruning for dormant edges while amplifying real-time burst signals.",
+    "mermaid_code": "",
+    "chart_spec": {
+      "chart_type": "line",
+      "title": "Temporal Signal Decay Model Comparison",
+      "x_label": "Time Elapsed (\u0394t)",
+      "y_label": "Effective Weight W(e, t)",
+      "series": [
+        {
+          "name": "Linear Decay",
+          "x": [
+            0,
+            150,
+            300,
+            450,
+            600
+          ],
+          "y": [
+            1.0,
+            0.75,
+            0.5,
+            0.25,
+            0.0
+          ]
+        },
+        {
+          "name": "Fixed Exponential Decay",
+          "x": [
+            0,
+            150,
+            300,
+            450,
+            600
+          ],
+          "y": [
+            1.0,
+            0.6,
+            0.36,
+            0.22,
+            0.13
+          ]
+        },
+        {
+          "name": "Dynamic Ephemeral Velocity Decay",
+          "x": [
+            0,
+            150,
+            300,
+            450,
+            600
+          ],
+          "y": [
+            1.0,
+            0.2,
+            0.03,
+            0.005,
+            0.0001
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "x": 600,
+          "y": 0.0001,
+          "text": "Dormant Node Retention < 0.01"
+        }
+      ]
+    },
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 10,
+      "brand_consistency": 10,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/sec-02-formulating-dynamic-edge-weight-decay-vi.png"
+  },
+  {
+    "slot_id": "sec-03-implementing-real-time-topological-pruni",
+    "is_cover": false,
+    "heading": "Implementing Real-Time Topological Pruning on Message Streams",
+    "core_technical_idea": "The pipeline flow of evaluating structural density gradients and pruning expired edges in the dynamic graph stream engine.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Incoming edge stream with timestamps",
+      "DynamicStreamPruner evaluation window",
+      "Velocity and effective lambda calculation",
+      "Threshold comparison and garbage collection"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom pipeline flow showing ingestion, velocity tracking, weight decay computation, and edge retention/pruning.",
+    "alt_text": "Mermaid diagram showing the real-time topological pruning architecture and data flow.",
+    "caption": "Edge stream evaluation pipeline executing dynamic decay and structural pruning in real time.",
+    "mermaid_code": "flowchart TD\n    A[Incoming Edge Stream] --> B[DynamicStreamPruner]\n    B --> C[Calculate Local Velocity & Delta T]\n    C --> D[Compute Effective Lambda & Decayed Weight]\n    D --> E{Weight >= Threshold?}\n    E -->|Yes| F[Retain Edge in Adjacency List]\n    E -->|No| G[Prune Edge & Increment Counter]\n    F --> H[Compute Local Structural Density]\n    G --> H",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/sec-03-implementing-real-time-topological-pruni.png"
+  },
+  {
+    "slot_id": "sec-04-auditing-failure-modes-in-high-throughpu",
+    "is_cover": false,
+    "heading": "Auditing Failure Modes in High-Throughput Fraud Engines",
+    "core_technical_idea": "Visualizing the operational failure modes, root causes, and architectural mitigations in real-time graph pruning for fraud engines.",
+    "visual_type": "table_card",
+    "must_show": [
+      "Failure modes including Burst False-Positives, Garbage Collection Overhead, and Sub-threshold Leakage",
+      "Direct mapping of root causes, operational impacts, and precise engineering mitigations"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A clean, structured matrix highlighting technical risk auditing parameters and database ingestion bottlenecks.",
+    "alt_text": "A structured audit table detailing failure modes, root causes, impacts, and mitigation strategies for high-throughput fraud engines.",
+    "caption": "Systematic breakdown of structural pruning failure modes and their production-grade architectural mitigations.",
+    "mermaid_code": "",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": {
+      "headers": [
+        "Failure Mode",
+        "Root Cause",
+        "Impact",
+        "Mitigation Strategy"
+      ],
+      "rows": [
+        [
+          "Burst False-Positives",
+          "Legitimate payroll or holiday marketing bursts trigger sudden velocity spikes.",
+          "Valid connections are aggressively pruned; user entities get fragmented.",
+          "Include static identity anchors (e.g., verified SSN/Tax ID) as un-prunable edges."
+        ],
+        [
+          "Garbage Collection Overhead",
+          "In-memory stream processors block ingestion threads during deep graph walks.",
+          "High tail latency (P99 > 100ms), driving fallback to legacy bypass.",
+          "Asynchronous depth-bounded graph traversal using thread-local ring buffers."
+        ],
+        [
+          "Sub-threshold Leakage",
+          "Adversary tunes attack velocity precisely above pruning threshold (e.g., epsilon + threshold).",
+          "Slow accumulation of poisonous structure continues undetected.",
+          "Dynamic threshold scaling based on global risk state indicators."
+        ]
+      ]
+    },
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 6,
+      "aesthetic_quality": 6,
+      "brand_consistency": 9,
+      "artifacts": 4
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/sec-04-auditing-failure-modes-in-high-throughpu.png"
+  },
+  {
+    "slot_id": "sec-05-production-grade-pipeline-optimization-a",
+    "is_cover": false,
+    "heading": "Production-Grade Pipeline Optimization and Benchmarking",
+    "core_technical_idea": "Pipeline architecture for sub-10ms streaming graph processing, combining dynamic decay and topological pruning before GNN inference.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Event Stream",
+      "Flink Processor",
+      "Local Memory Graph",
+      "Dynamic Decay",
+      "Topological Prune",
+      "GNN Inference Engine"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down directed acyclic flow showing event ingress, parallel state operations in Flink, memory state maintenance, and convergence on the GNN inference engine.",
+    "alt_text": "Architecture diagram detailing the low-latency streaming pipeline from event ingress through Flink processing, local memory graph decay and pruning, to GNN inference.",
+    "caption": "Low-latency streaming topology: localized topological pruning and dynamic memory bounding maintain sub-10ms processing windows.",
+    "mermaid_code": "flowchart TD\n    A[Event Stream] -->|Ingest Batch| B[Flink Processor]\n    B --> C[Local Memory Graph]\n    C --> D[Dynamic Decay]\n    C --> E[Topological Prune]\n    D --> F[GNN Inference Engine]\n    E --> F",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/sec-05-production-grade-pipeline-optimization-a.png"
+  },
+  {
+    "slot_id": "sec-06-try-it-yourself",
+    "is_cover": false,
+    "heading": "Try It Yourself",
+    "core_technical_idea": "Step-by-step pipeline for benchmarking synthetic dormant ring attacks against dynamic structural decay ingestion.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Simulate Dormant Ring Attack node generation",
+      "DynamicStreamPruner ingestion stream",
+      "Comparison of static weight decay vs calculate_dynamic_decay",
+      "Downstream local clustering coefficient measurement"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down flowchart showing sequential execution from simulation to stream ingestion and metric comparison.",
+    "alt_text": "A flowchart detailing the three-step benchmark pipeline for testing dormant ring attacks using DynamicStreamPruner.",
+    "caption": "Execution pipeline for validating dynamic decay against synthetic temporal poisoning metrics.",
+    "mermaid_code": "flowchart TD\n    A[Step 1: Simulate Dormant Ring Attack] -->|1,000 nodes, 10-node ring, 30d timestamp offset| B[Step 2: Execute Ingestion]\n    B -->|DynamicStreamPruner| C{Decay Strategy}\n    C -->|Static Weight Decay| D[Baseline Poisoning Metrics]\n    C -->|calculate_dynamic_decay| E[Dynamic Pruned Stream]\n    D --> F[Step 3: Compare Clustering Scores]\n    E --> F\n    F -->|>90% Drop in Structural Poisoning| G[Verified Resilient Pipeline]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-15/sec-06-try-it-yourself.png"
+  }
+]
