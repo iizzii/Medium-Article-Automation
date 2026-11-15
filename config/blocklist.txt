@@ -1,0 +1,7 @@
+# Confidentiality blocklist (one case-insensitive term or regex per line).
+# Lines starting with # are ignored.
+# Add any internal tool names, codenames, project names, or non-public metrics here.
+#
+# Example:
+# internal-codename
+# my-company-name

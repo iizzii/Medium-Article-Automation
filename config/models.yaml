@@ -1,0 +1,23 @@
+# Gemini model configuration (never hardcode model names in Python source)
+models:
+  topic_selector: gemini-2.5-flash
+  outliner: gemini-2.5-flash
+  writer: gemini-2.5-pro
+  grounding: gemini-2.5-flash
+  text_critic: gemini-2.5-flash
+  visual_planner: gemini-2.5-flash
+  image_generator: imagen-3.0-generate-002
+  image_critic: gemini-2.5-flash
+  embedding: text-embedding-004
+
+generation:
+  temperature_topic: 0.9
+  temperature_outline: 0.4
+  temperature_writer: 0.5
+  temperature_critic: 0.1
+  temperature_visual_planner: 0.3
+  similarity_threshold: 0.80
+  history_lookback: 90
+  max_rewrite_loops: 2
+  max_image_rounds: 3
+  image_candidates: 3

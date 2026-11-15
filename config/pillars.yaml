@@ -1,0 +1,118 @@
+# Content pillars for a Security Engineering Lead writing for practitioners
+pillars:
+  - id: abuse_fraud_detection
+    name: Abuse & Fraud Detection at Scale
+    description: >
+      Rule engines, scoring systems, entity clustering, signal engineering,
+      adversarial adaptation, rule decay, and abandonment criteria.
+    seed_themes:
+      - rule half-life and signal decay in production
+      - adversarial adaptation against velocity and graph features
+      - EDR/detector bypass mechanics and telemetry blind spots
+      - clustering coordinated abuse rings without drowning in false merges
+    tags:
+      - Fraud Detection
+      - Abuse Prevention
+      - Security Engineering
+      - Signal Engineering
+      - Trust And Safety
+
+  - id: security_automation_soar
+    name: Security Automation & SOAR
+    description: >
+      Auto-triage gates, precision-recall trade-offs, human-in-the-loop design,
+      and measuring automation quality against analyst verdicts.
+    seed_themes:
+      - setting auto-close precision thresholds vs queue capacity
+      - out-of-band patches or automated containment breaking production
+      - shadow mode evaluation before enabling auto-remediation
+      - measuring SOAR playbook drift against senior analyst verdicts
+    tags:
+      - Security Automation
+      - SOAR
+      - SecOps
+      - Incident Response
+      - Cybersecurity
+
+  - id: detection_engineering
+    name: Detection Engineering
+    description: >
+      Writing, testing, backfilling, and retiring rules; false-positive economics
+      and alert fatigue math.
+    seed_themes:
+      - false-positive economics and analyst cost per alert
+      - backfilling detection rules over historical telemetry
+      - retiring dead or noisy rules safely
+      - kernel-level and supply-chain telemetry gaps
+    tags:
+      - Detection Engineering
+      - Threat Detection
+      - Blue Team
+      - Cybersecurity
+      - InfoSec
+
+  - id: compliance_audit_automation
+    name: Compliance & Audit Automation
+    description: >
+      Reconciliation pipelines, evidence integrity, catching missing records,
+      and deterministic ID pattern matching.
+    seed_themes:
+      - automated evidence reconciliation across heterogeneous logs
+      - catching silent drops and missing audit records
+      - cryptographic integrity checks for compliance artifacts
+      - deterministic ID pattern matching without regex catastrophic backtracking
+    tags:
+      - Compliance Automation
+      - Security Engineering
+      - Audit
+      - DevSecOps
+      - Data Integrity
+
+  - id: ops_tooling_engineering
+    name: Ops Tooling Engineering
+    description: >
+      Apps Script / Sheets as production tools, SLA notifiers, queue routing,
+      workload-balancing algorithms, and building internal consoles.
+    seed_themes:
+      - treating spreadsheets and lightweight scripts as real production systems
+      - SLA breach prediction and escalation routing
+      - weighted round-robin and skill-based queue balancing
+      - building internal triage consoles with audit trails
+    tags:
+      - Security Operations
+      - Internal Tools
+      - Automation
+      - Engineering
+      - Queue Management
+
+  - id: applied_ai_security
+    name: Applied AI for Security
+    description: >
+      LLM triage, eval design, prompt-injection defense, and agentic SOC workflows.
+    seed_themes:
+      - designing offline evals for LLM alert triage before production rollout
+      - defending agentic SOC pipelines against indirect prompt injection
+      - structured output validation and deterministic guardrails around LLMs
+      - cost and latency budgets for AI-assisted investigation
+    tags:
+      - AI Security
+      - LLM
+      - Security Operations
+      - Machine Learning
+      - Prompt Injection
+
+  - id: leading_security_teams
+    name: Leading Security Teams
+    description: >
+      QA rotations, reviewer throughput, calibration, and operational runbooks.
+    seed_themes:
+      - running blind QA calibration across review analysts
+      - measuring reviewer throughput without incentivizing rubber-stamping
+      - writing runbooks that survive 3 AM incidents
+      - structuring on-call and QA rotations to prevent burnout
+    tags:
+      - Engineering Leadership
+      - Security Operations
+      - Management
+      - Trust And Safety
+      - Incident Management

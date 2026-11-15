@@ -1,0 +1,234 @@
+{
+  "title": "Setting Auto-Close Gates at 97% Precision, Not 90%",
+  "pillar": "Security Automation & SOAR",
+  "format": "PLAYBOOK",
+  "text_critic_scores": {
+    "technical_depth": 9,
+    "accuracy": 9,
+    "originality": 9,
+    "readability": 9,
+    "actionability": 10,
+    "hook_strength": 9,
+    "heading_specificity": 10
+  },
+  "visuals": [
+    {
+      "slot_id": "cover",
+      "is_cover": true,
+      "heading": "Setting Auto-Close Gates at 97% Precision, Not 90%",
+      "core_technical_idea": "Three-tier SOAR precision gating at scale",
+      "visual_type": "diagram",
+      "must_show": [
+        "50k Daily Events",
+        "Calibrated Scorer",
+        "97% Auto-Close Gate",
+        "Analyst Queue"
+      ],
+      "must_avoid": [
+        "padlocks",
+        "hooded hackers"
+      ],
+      "metaphor": "",
+      "composition": "Left-to-right architecture",
+      "alt_text": "Pipeline diagram showing event ingestion, scoring, 97% precision auto-close gate, and analyst review queue",
+      "caption": "A 97% precision gate isolates high-confidence closures while preserving analyst bandwidth for ambiguous edge cases.",
+      "mermaid_code": "",
+      "chart_spec": null,
+      "code_snippet": "",
+      "table_data": null,
+      "section_text": "",
+      "image_prompt": "",
+      "critic_scores": {
+        "heading_relevance": 9,
+        "technical_fidelity": 9,
+        "aesthetic_quality": 9,
+        "brand_consistency": 10,
+        "artifacts": 10
+      },
+      "final_path": "samples/assets/cover.png"
+    },
+    {
+      "slot_id": "sec-01-base-rate-math",
+      "is_cover": false,
+      "heading": "Why 90% Precision Fails the Base-Rate Math in High-Volume Queues",
+      "core_technical_idea": "Daily false positives drop from 5,000 to 1,500 at 97% precision",
+      "visual_type": "chart",
+      "must_show": [
+        "Precision threshold vs Daily False Positives"
+      ],
+      "must_avoid": [
+        "padlocks"
+      ],
+      "metaphor": "",
+      "composition": "Line chart",
+      "alt_text": "Line chart of daily false positives and analyst queue hours across precision thresholds from 85% to 99%",
+      "caption": "Moving the auto-action gate from 0.90 to 0.97 cuts daily false actions from 5,000 to 1,500.",
+      "mermaid_code": "",
+      "chart_spec": {
+        "chart_type": "line",
+        "title": "Daily False Actions vs Precision Gate (50,000 Alerts/Day)",
+        "x_label": "Precision Threshold",
+        "y_label": "Daily False Positives",
+        "series": [
+          {
+            "name": "50,000 Daily Events",
+            "x": [
+              0.85,
+              0.9,
+              0.95,
+              0.97,
+              0.99
+            ],
+            "y": [
+              7500,
+              5000,
+              2500,
+              1500,
+              500
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "x": 0.97,
+            "y": 1500,
+            "text": "97% Auto-Close Gate (1,500)"
+          }
+        ]
+      },
+      "code_snippet": "",
+      "table_data": null,
+      "section_text": "",
+      "image_prompt": "",
+      "critic_scores": {
+        "heading_relevance": 10,
+        "technical_fidelity": 10,
+        "aesthetic_quality": 9,
+        "brand_consistency": 10,
+        "artifacts": 10
+      },
+      "final_path": "samples/assets/sec-01-base-rate-math.png"
+    },
+    {
+      "slot_id": "sec-02-three-tier-gate",
+      "is_cover": false,
+      "heading": "Designing a Three-Tier SOAR Triage Gate With Shadow Logging",
+      "core_technical_idea": "Three-band precision router",
+      "visual_type": "diagram",
+      "must_show": [
+        "Calibrated Score",
+        ">=0.97 Auto-Close",
+        "0.75-0.96 Analyst Queue",
+        "<0.75 Shadow Log"
+      ],
+      "must_avoid": [
+        "padlocks"
+      ],
+      "metaphor": "",
+      "composition": "Horizontal pipeline",
+      "alt_text": "Architecture diagram of the three-tier SOAR triage router",
+      "caption": "Splitting a single binary threshold into three bands prevents both silent customer impact and analyst queue saturation.",
+      "mermaid_code": "",
+      "chart_spec": null,
+      "code_snippet": "",
+      "table_data": null,
+      "section_text": "",
+      "image_prompt": "",
+      "critic_scores": {
+        "heading_relevance": 9,
+        "technical_fidelity": 9,
+        "aesthetic_quality": 9,
+        "brand_consistency": 10,
+        "artifacts": 10
+      },
+      "final_path": "samples/assets/sec-02-three-tier-gate.png"
+    },
+    {
+      "slot_id": "sec-03-drift-check",
+      "is_cover": false,
+      "heading": "Measuring Automation Drift Against Blind Analyst Verdicts",
+      "core_technical_idea": "95% Wilson lower bound QA check",
+      "visual_type": "code_card",
+      "must_show": [
+        "wilson_lower_bound"
+      ],
+      "must_avoid": [
+        "padlocks"
+      ],
+      "metaphor": "",
+      "composition": "Code card",
+      "alt_text": "Carbon-style code card showing the weekly Wilson confidence interval check",
+      "caption": "Computing a 95% Wilson lower bound on weekly QA samples catches rule decay before precision drops below 0.97.",
+      "mermaid_code": "",
+      "chart_spec": null,
+      "code_snippet": "def wilson_lower_bound(tp: int, total: int, z: float = 1.96) -> float:\n    if total == 0:\n        return 0.0\n    p_hat = tp / total\n    denom = 1.0 + (z * z) / total\n    center = p_hat + (z * z) / (2.0 * total)\n    margin = z * math.sqrt((p_hat * (1.0 - p_hat) + (z * z) / (4.0 * total)) / total)\n    return (center - margin) / denom",
+      "table_data": null,
+      "section_text": "",
+      "image_prompt": "",
+      "critic_scores": {
+        "heading_relevance": 9,
+        "technical_fidelity": 10,
+        "aesthetic_quality": 9,
+        "brand_consistency": 10,
+        "artifacts": 10
+      },
+      "final_path": "samples/assets/sec-03-drift-check.png"
+    },
+    {
+      "slot_id": "sec-04-pitfalls-matrix",
+      "is_cover": false,
+      "heading": "Common Pitfalls When Deploying Auto-Close Playbooks",
+      "core_technical_idea": "Rollback triggers and blast-radius controls",
+      "visual_type": "table_card",
+      "must_show": [
+        "Failure Mode",
+        "Trigger",
+        "Control"
+      ],
+      "must_avoid": [
+        "padlocks"
+      ],
+      "metaphor": "",
+      "composition": "Table card",
+      "alt_text": "Decision matrix table card comparing rollback triggers and blast-radius controls",
+      "caption": "Explicit rollback triggers ensure degraded rules demote to shadow mode within one evaluation window.",
+      "mermaid_code": "",
+      "chart_spec": null,
+      "code_snippet": "",
+      "table_data": {
+        "headers": [
+          "Failure Mode",
+          "Detection Signal",
+          "Automated Control"
+        ],
+        "rows": [
+          [
+            "Uncalibrated tree score",
+            "Brier score > 0.08",
+            "Apply isotonic calibration"
+          ],
+          [
+            "Upstream logging 20x spike",
+            "Hourly actions > 2x p99",
+            "Trip rate-limiter circuit breaker"
+          ],
+          [
+            "QA anchoring bias",
+            "Blind vs unblind gap > 4%",
+            "Strip automation verdict in QA"
+          ]
+        ]
+      },
+      "section_text": "",
+      "image_prompt": "",
+      "critic_scores": {
+        "heading_relevance": 9,
+        "technical_fidelity": 9,
+        "aesthetic_quality": 9,
+        "brand_consistency": 10,
+        "artifacts": 10
+      },
+      "final_path": "samples/assets/sec-04-pitfalls-matrix.png"
+    }
+  ]
+}

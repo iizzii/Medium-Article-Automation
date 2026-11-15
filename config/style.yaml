@@ -1,0 +1,38 @@
+# Brand & visual specification
+brand:
+  background: "#0B1220"
+  surface: "#111C33"
+  surface_alt: "#172542"
+  border: "#233554"
+  accent_primary: "#00E5FF"
+  accent_secondary: "#FFB020"
+  accent_success: "#22C55E"
+  accent_danger: "#EF4444"
+  text_primary: "#F1F5F9"
+  text_secondary: "#94A3B8"
+
+dimensions:
+  cover_width: 1400
+  cover_height: 788
+  inline_width: 1400
+  inline_height: 788
+  dpi: 200
+  max_file_bytes: 1000000
+  jpeg_quality: 90
+
+fonts:
+  sans: "config/fonts/Inter-Regular.ttf"
+  sans_bold: "config/fonts/Inter-Bold.ttf"
+  mono: "config/fonts/JetBrainsMono-Regular.ttf"
+  mono_bold: "config/fonts/JetBrainsMono-Bold.ttf"
+
+image_style:
+  suffix: >
+    Dark navy (#0B1220) background, electric cyan (#00E5FF) and warm amber (#FFB020)
+    accents, clean isometric abstract-technical 3D aesthetic, soft volumetric lighting,
+    high detail, crisp geometric edges, generous negative space, editorial magazine
+    quality, focal subject centered with wide safe margins.
+  negative_prompt: >
+    text, letters, numbers, words, labels, watermarks, signatures, logos,
+    padlocks, hooded hackers, binary rain, matrix green code, random circuit boards,
+    human faces, hands, extra limbs, blurry, noisy, low resolution, cluttered.

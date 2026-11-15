@@ -1,0 +1,64 @@
+# Rotating article formats (never repeat back-to-back)
+formats:
+  - id: deep_dive
+    name: DEEP DIVE
+    description: >
+      Architectural and systems-level breakdown of a real mechanism, failure mode,
+      or trade-off with concrete math, diagrams, and code.
+    requirements: >
+      Include system architecture diagram, failure-mode analysis, worked numbers,
+      and production-grade Python implementation snippets.
+
+  - id: workshop
+    name: WORKSHOP
+    description: >
+      Hands-on, reproducible engineering walkthrough with complete runnable Python
+      code and reader exercises.
+    requirements: >
+      Must include a complete self-contained runnable Python script, sample
+      input/output, and 2-3 concrete reader exercises in 'Try it yourself'.
+
+  - id: playbook
+    name: PLAYBOOK
+    description: >
+      Actionable operational decision framework with explicit thresholds,
+      escalation matrices, and rollback criteria.
+    requirements: >
+      Must include a decision matrix table (or table_card), explicit numeric
+      thresholds, and step-by-step operational runbook stages.
+
+  - id: illustrative_case_study
+    name: ILLUSTRATIVE CASE STUDY
+    description: >
+      A clearly labeled fictional scenario modeled on realistic industry patterns,
+      showing root cause, metrics before/after, and lessons learned.
+    requirements: >
+      Must explicitly state in the opening that the scenario and numbers are
+      illustrative/fictional composites, with realistic telemetry and postmortem math.
+
+  - id: myth_vs_reality
+    name: MYTH vs REALITY
+    description: >
+      Deconstructs a widespread vendor or industry orthodoxy using empirical
+      reasoning, base-rate math, and production evidence.
+    requirements: >
+      Contrast common vendor claims against operational reality with worked
+      examples and a comparison table.
+
+  - id: metrics_and_math
+    name: METRICS & MATH
+    description: >
+      Quantitative analysis of security/ops trade-offs (precision-recall,
+      base-rate fallacy, queue theory, rule half-life) with worked calculations.
+    requirements: >
+      Must include explicit formulas, worked numerical examples, and a matplotlib
+      chart plotting the exact numbers from the text.
+
+  - id: future_opinion
+    name: FUTURE / OPINION
+    description: >
+      Sharp, opinionated practitioner thesis on where detection, automation, or
+      security ops is heading over the next 2-3 years—backed by concrete mechanics.
+    requirements: >
+      Avoid vague predictions; anchor every claim in current architectural
+      constraints, cost curves, and falsifiable operational indicators.

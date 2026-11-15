@@ -1,0 +1,107 @@
+name: Daily Technical Medium Article
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # 03:30 UTC -> 09:00 IST daily
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Generate article & images without publishing to Medium or Telegram'
+        type: boolean
+        default: false
+      force_topic:
+        description: 'Optional topic override'
+        type: string
+        default: ''
+      format:
+        description: 'Optional format override (e.g. DEEP DIVE, WORKSHOP, PLAYBOOK)'
+        type: string
+        default: ''
+      publish_status:
+        description: 'Medium publishStatus (draft, public, unlisted)'
+        type: choice
+        options:
+          - draft
+          - public
+          - unlisted
+        default: draft
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: daily-medium-article
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Set up Node.js for Mermaid CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install system tools (Graphviz, Chromium deps, fonts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq graphviz fonts-inter fonts-jetbrains-mono
+          npm install -g @mermaid-js/mermaid-cli
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run autonomous pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MEDIUM_TOKEN: ${{ secrets.MEDIUM_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PUBLISH_STATUS: ${{ inputs.publish_status || vars.PUBLISH_STATUS || 'draft' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=()
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ -n "${{ inputs.force_topic }}" ]; then
+            ARGS+=(--force-topic "${{ inputs.force_topic }}")
+          fi
+          if [ -n "${{ inputs.format }}" ]; then
+            ARGS+=(--format "${{ inputs.format }}")
+          fi
+          if [ -n "${{ inputs.publish_status }}" ]; then
+            ARGS+=(--publish-status "${{ inputs.publish_status }}")
+          fi
+          python -m src.pipeline "${ARGS[@]}"
+
+      - name: Upload generated artifacts on dry run
+        if: always() && inputs.dry_run == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-article-${{ github.run_number }}
+          path: |
+            output/
+            assets/
+          if-no-files-found: ignore
+
+      - name: Commit updated state and fallback outputs
+        if: always() && inputs.dry_run != true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/history.json output/ assets/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update article state and assets [skip ci]"
+            git push
+          fi
