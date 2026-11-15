@@ -1,17 +1,18 @@
 # Gemini model configuration (never hardcode model names in Python source)
 models:
-  topic_selector: gemini-3.6-flash
-  outliner: gemini-3.6-flash
+  topic_selector: gemini-3.8-flash-lite
+  outliner: gemini-3.8-flash-lite
   writer: gemini-3.6-flash
-  grounding: gemini-3.6-flash
-  text_critic: gemini-3.6-flash
-  visual_planner: gemini-3.6-flash
+  grounding: gemini-2.5-flash-lite
+  text_critic: gemini-3.8-flash-lite
+  visual_planner: gemini-2.5-flash-lite
   image_generator: imagen-3.0-generate-002
-  image_critic: gemini-3.6-flash
+  image_critic: gemini-3.8-flash-lite
   embedding: gemini-embedding-001
   fallback_models:
-    - gemini-3.8-flash-lite
     - gemini-2.5-flash-lite
+    - gemini-3.8-flash-lite
+    - gemini-3.6-flash
     - gemini-3.8-flash
 
 generation:

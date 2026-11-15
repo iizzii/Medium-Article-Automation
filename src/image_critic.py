@@ -9,7 +9,7 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 
-from src.config_loader import extract_json, load_prompt, load_yaml
+from src.config_loader import call_with_retry, extract_json, load_prompt, load_yaml
 from src.images_ai import generate_illustration_candidates
 from src.images_render import (
     render_chart,
@@ -52,7 +52,8 @@ def critique_image(
     img_bytes = image_path.read_bytes()
 
     try:
-        resp = client.models.generate_content(
+        resp = call_with_retry(
+            client.models.generate_content,
             model=critic_model,
             contents=types.Content(
                 role="user",

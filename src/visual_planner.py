@@ -10,7 +10,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from src.config_loader import extract_json, load_prompt, load_yaml
+from src.config_loader import call_with_retry, extract_json, load_prompt, load_yaml
 
 logger = logging.getLogger("medium_pipeline.visual_planner")
 
@@ -86,7 +86,8 @@ def plan_visuals(
         heading=title,
         section_text=f"Subtitle: {subtitle}\n\n{intro[:2000]}",
     )
-    cover_resp = client.models.generate_content(
+    cover_resp = call_with_retry(
+        client.models.generate_content,
         model=planner_model,
         contents=cover_prompt,
         config=types.GenerateContentConfig(
@@ -130,7 +131,8 @@ def plan_visuals(
             heading=h2,
             section_text=body[:3500],
         )
-        resp = client.models.generate_content(
+        resp = call_with_retry(
+            client.models.generate_content,
             model=planner_model,
             contents=sec_prompt,
             config=types.GenerateContentConfig(
