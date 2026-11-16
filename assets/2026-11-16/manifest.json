@@ -1,0 +1,329 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Auditing iOS Keychain and Biometric Bypasses in Production",
+    "core_technical_idea": "Demonstrate the structural security divergence between vulnerable local biometric UI gates and Secure Enclave hardware-bound cryptographic keys.",
+    "visual_type": "diagram",
+    "must_show": [
+      "LocalAuthentication LAContext UI gate separate from Keychain storage",
+      "kSecAttrAccessibleAfterFirstUnlock persistent exposure window",
+      "Secure Enclave hardware-bound keys with kSecAccessControlBiometryAny"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Side-by-side comparative architecture flow showing an insecure UI-only biometric check versus a secure hardware-backed cryptographic enclave check.",
+    "alt_text": "Architectural diagram comparing insecure local biometric UI gates against hardware-bound Secure Enclave cryptographic protection in iOS Keychain.",
+    "caption": "Biometric prompts act merely as local UI gates unless explicitly bound to Secure Enclave cryptographic keys via SecAccessControl.",
+    "mermaid_code": "flowchart TD\n    subgraph Insecure [Vulnerable UI Gate Pattern]\n        A[FaceID / TouchID Prompt] -->|LAContext Success| B[Local App State Unlocked]\n        B -->|Tokens Stored With| C[kSecAttrAccessibleAfterFirstUnlock]\n        C -->|Readable in Memory| D[Persistent Session Exposure]\n    end\n\n    subgraph Secure [Hardware-Bound Cryptographic Pattern]\n        E[FaceID / TouchID Prompt] -->|SecAccessControl| F[Secure Enclave]\n        F -->|Requires BiometryAny / CurrentSet| G[Cryptographic Key Decryption]\n        G -->|Success| H[Secure Token Access]\n    end\n\n    style Insecure fill:#ffebee,stroke:#c62828,stroke-width:2px\n    style Secure fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 7,
+      "brand_consistency": 6,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/cover.png"
+  },
+  {
+    "slot_id": "sec-01-mapping-keychain-accessibility-classes-t",
+    "is_cover": false,
+    "heading": "Mapping Keychain Accessibility Classes to Data Protection Risk",
+    "core_technical_idea": "Visualizing the inverse relationship between Keychain accessibility attributes and their associated data protection risk scores, highlighting memory persistence windows.",
+    "visual_type": "chart",
+    "must_show": [
+      "Risk scores ranging from 1.0 to 8.8",
+      "Keychain accessibility attributes mapped to risk values",
+      "Clear distinction between hardware-backed vs after-first-unlock persistence"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Horizontal bar chart ordered by risk score descending, with color coding indicating high vulnerability (red) to maximum security (green).",
+    "alt_text": "Horizontal bar chart comparing iOS Keychain accessibility attributes against their data protection risk scores from 1 to 10.",
+    "caption": "Risk escalation profile across iOS Keychain accessibility classes, showing how persistence after device lock drastically elevates attack surface risk.",
+    "mermaid_code": "",
+    "chart_spec": {
+      "chart_type": "bar",
+      "title": "Keychain Accessibility Attributes vs. Data Protection Risk Score",
+      "x_label": "Risk Score (1-10)",
+      "y_label": "Keychain Accessibility Attribute",
+      "series": [
+        {
+          "name": "Risk Score",
+          "x": [
+            8.8,
+            6.5,
+            3.2,
+            2.5,
+            1.0
+          ],
+          "y": [
+            "kSecAttrAccessibleAfterFirstUnlock",
+            "kSecAttrAccessibleWhenUnlocked",
+            "kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly",
+            "kSecAttrAccessibleWhenUnlockedThisDeviceOnly",
+            "kSecAccessControlCreateFlags + Secure Enclave"
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "x": 8.8,
+          "y": 0,
+          "text": "Persists in memory post-unlock"
+        }
+      ]
+    },
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 6,
+      "brand_consistency": 9,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/sec-01-mapping-keychain-accessibility-classes-t.png"
+  },
+  {
+    "slot_id": "sec-02-decoupling-localauthentication-success-f",
+    "is_cover": false,
+    "heading": "Decoupling LocalAuthentication Success from Persistent Storage",
+    "core_technical_idea": "Demonstrating how a decoupled LAContext boolean gate allows direct Keychain queries without cryptographic binding, bypassing secure access control.",
+    "visual_type": "diagram",
+    "must_show": [
+      "User Action",
+      "LAContext evaluatePolicy",
+      "SecItemCopyMatching",
+      "Keychain storage without SecAccessControl"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom sequence and data flow showing the decoupled pathways between the LocalAuthentication check and the independent Keychain query.",
+    "alt_text": "Sequence diagram illustrating the vulnerable iOS anti-pattern where LAContext acts as a boolean gate independent of SecItemCopyMatching.",
+    "caption": "The architectural anti-pattern: treating LocalAuthentication as a boolean gate rather than tying access control directly to the Keychain item.",
+    "mermaid_code": "flowchart TD\n    A[User Action] --> B[LAContext evaluatePolicy]\n    B -->|Returns Success (true)| C[SecItemCopyMatching]\n    C --> D[(Keychain Storage\nNo SecAccessControl)]\n    style B fill:#f9f,stroke:#333,stroke-width:2px\n    style C fill:#ff9999,stroke:#333,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 6,
+      "brand_consistency": 8,
+      "artifacts": 5
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/sec-02-decoupling-localauthentication-success-f.png"
+  },
+  {
+    "slot_id": "sec-03-defining-quantitative-risk-thresholds-fo",
+    "is_cover": false,
+    "heading": "Defining Quantitative Risk Thresholds for Class Downgrades",
+    "core_technical_idea": "Mapping specific iOS Keychain accessibility flags to quantitative risk scores and static analysis pipeline thresholds.",
+    "visual_type": "table_card",
+    "must_show": [
+      "Keychain accessibility flags",
+      "Assigned risk scores",
+      "Compliance classification status"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Structured data table highlighting insecure versus secure Keychain attributes and their corresponding quantitative weights.",
+    "alt_text": "Table mapping iOS Keychain accessibility flags like kSecAttrAccessibleAlways to quantitative risk scores and thresholds.",
+    "caption": "Quantitative risk scoring matrix mapping insecure Keychain attributes directly to static analysis compliance penalties.",
+    "mermaid_code": "",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": {
+      "headers": [
+        "Keychain Accessibility Flag",
+        "Risk Score",
+        "Classification",
+        "Remediation Target"
+      ],
+      "rows": [
+        [
+          "kSecAttrAccessibleAlways",
+          "10.0",
+          "Critical Violation",
+          "kSecAttrAccessibleWhenUnlockedThisDeviceOnly"
+        ],
+        [
+          "kSecAttrAccessibleAlwaysThisDeviceOnly",
+          "9.5",
+          "Critical Violation",
+          "kSecAttrAccessibleWhenUnlockedThisDeviceOnly"
+        ],
+        [
+          "kSecAttrAccessibleAfterFirstUnlock",
+          "8.8",
+          "High Risk",
+          "kSecAttrAccessibleWhenUnlockedThisDeviceOnly"
+        ],
+        [
+          "kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly",
+          "7.5",
+          "Medium Risk",
+          "kSecAttrAccessibleWhenUnlockedThisDeviceOnly"
+        ],
+        [
+          "kSecAttrAccessibleWhenUnlocked",
+          "0.0",
+          "Secure",
+          "None"
+        ],
+        [
+          "kSecAttrAccessibleWhenUnlockedThisDeviceOnly",
+          "0.0",
+          "Secure",
+          "None"
+        ]
+      ]
+    },
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 6
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/sec-03-defining-quantitative-risk-thresholds-fo.png"
+  },
+  {
+    "slot_id": "sec-04-building-frida-runtime-instrumentation-w",
+    "is_cover": false,
+    "heading": "Building Frida Runtime Instrumentation Workflows for Interception",
+    "core_technical_idea": "The execution flow and data extraction pathway when Frida hooks SecItemCopyMatching to audit iOS Keychain queries.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Python Runner script initialization",
+      "Frida Interceptor attaching to Security framework",
+      "SecItemCopyMatching hook intercepting arguments",
+      "ObjC Object parameter extraction and JSON messaging back to host"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down sequence flow showing the interaction between the Python runner, the Frida runtime hook inside the target process, and the intercepted Keychain query data.",
+    "alt_text": "Diagram showing the Frida instrumentation workflow: Python generates the hook, Frida attaches to SecItemCopyMatching, intercepts query parameters via Objective-C runtime, and transmits event details back to the host.",
+    "caption": "Runtime instrumentation pipeline demonstrating how Frida intercepts `SecItemCopyMatching` calls to extract and inspect Keychain query attributes.",
+    "mermaid_code": "flowchart TD\n    A[Python Runner Script] -->|Generates Hook| B(Frida Runtime)\n    B -->|Module.findExportByName| C{Security Framework}\n    C -->|SecItemCopyMatching found| D[Interceptor.attach]\n    D -->|onEnter: Extract args[0]| E[ObjC.Object Parameter Mapping]\n    E -->|send() payload| F[process_runtime_event]\n    F -->|Print Audit Log| G[Terminal Output]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 6,
+      "brand_consistency": 9,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/sec-04-building-frida-runtime-instrumentation-w.png"
+  },
+  {
+    "slot_id": "sec-05-extracting-sensitive-tokens-before-biome",
+    "is_cover": false,
+    "heading": "Extracting Sensitive Tokens Before Biometric Evaluation Executes",
+    "core_technical_idea": "Demonstrating how low-level C APIs bypass high-level LAContext biometric UI prompts by querying the Keychain database directly.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Application Process",
+      "LAContext UI Prompt (Face ID / Touch ID)",
+      "Swift/Objective-C App Logic",
+      "Low-Level C API (SecItemCopyMatching)",
+      "Keychain Database (kSecAttrAccessibleAfterFirstUnlock)"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Two parallel execution paths showing the secure intended path gated by LAContext versus the direct bypass path via SecItemCopyMatching to the Keychain database.",
+    "alt_text": "Mermaid sequence diagram comparing the secure UI-gated authentication flow with the direct Keychain background extraction vulnerability.",
+    "caption": "Low-level C APIs can query the Keychain directly, completely bypassing the LAContext biometric evaluation layer.",
+    "mermaid_code": "flowchart TD\n    subgraph App[\"Application Process\"]\n        direction TB\n        Logic[\"Swift / Objective-C App Logic\"]\n        LAC[\"LAContext Biometric Prompt\"]\n        LowAPI[\"Low-Level C API (SecItemCopyMatching)\"]\n    end\n\n    subgraph Storage[\"Keychain Database\"]\n        KC[\"Encrypted Payload Storage\"]\n    end\n\n    Logic -->|\"Invokes\"| LAC\n    LAC -->|\"Success Callback Required\"| Logic\n    \n    LowAPI -->|\"Direct Query (Bypasses UI)\"| KC\n    KC -->|\"Returns Payload if kSecAttrAccessibleAfterFirstUnlock\"| LowAPI\n\n    style LAC fill:#f9f,stroke:#333,stroke-width:2px\n    style LowAPI fill:#ff9999,stroke:#333,stroke-width:2px\n    style KC fill:#99ccff,stroke:#333,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/sec-05-extracting-sensitive-tokens-before-biome.png"
+  },
+  {
+    "slot_id": "sec-06-hardening-production-codebases-against-a",
+    "is_cover": false,
+    "heading": "Hardening Production Codebases Against Automated Runtime Attacks",
+    "core_technical_idea": "Hardware-level cryptographic binding between the Secure Enclave, biometric validation flags, and keychain items to prevent runtime bypasses.",
+    "visual_type": "diagram",
+    "must_show": [
+      "SecAccessControlCreateWithFlags",
+      "kSecAttrAccessibleWhenUnlockedThisDeviceOnly",
+      ".biometryCurrentSet",
+      "Secure Enclave boundary",
+      "SecItemAdd / SecItemCopyMatching"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down sequence flow showing application request crossing the hardware boundary into the Secure Enclave with biometric enforcement.",
+    "alt_text": "Mermaid sequence diagram illustrating how SecAccessControl binds keychain items to the Secure Enclave and enforces biometric validation at the hardware level.",
+    "caption": "Hardware-enforced isolation: biometric prompts and key decryption occur entirely within the Secure Enclave, isolating them from application-level execution flow.",
+    "mermaid_code": "flowchart TD\n    A[Application Code] -->|SecItemAdd / SecItemCopyMatching| B(SecAccessControl\n.biometryCurrentSet)\n    subgraph Secure Enclave [Hardware Boundary]\n        B --> C{Biometric Profile Valid?}\n        C -->|Match| D[Release Decryption Key]\n        C -->|Enrollment Changed| E[Invalidate Key / Return Error]\n    end\n    D --> F[Secure Token Access]\n    E --> G[Access Denied]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 8,
+      "brand_consistency": 9,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-16/sec-06-hardening-production-codebases-against-a.png"
+  }
+]
