@@ -1,0 +1,260 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Fixing Smali Decompilation Hallucinations with RAG",
+    "core_technical_idea": "Graph-augmented RAG anchors Smali context retrieval using static call graphs and schema validation to eliminate false-positive cryptographic alerts in JNI wrappers.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Raw Smali chunks",
+      "Static Call Graph extraction",
+      "Vector embedding and RAG context retrieval",
+      "Schema Validation Guards",
+      "Deterministic False-Positive Reduction"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom pipeline showing the ingestion of raw Smali, context augmentation via static call graphs, constraint enforcement through schema validation, and final triage output.",
+    "alt_text": "A technical architecture flowchart showing how raw Smali code and static call graphs pass through a RAG pipeline and schema validation guards to eliminate false-positive cryptographic alerts.",
+    "caption": "Pipeline architecture illustrating how static call-graph constraints and schema guards isolate actual JNI flaws from base-model hallucinations.",
+    "mermaid_code": "flowchart TD\n    A[Raw Smali Chunks] -->|Context Collapse| B[Base LLM Triage]\n    B -->|64% False Positives| C[Insecure Cryptographic Alerts]\n    \n    A --> D[Static Call-Graph Extraction]\n    D --> E[Graph-Augmented RAG Context]\n    E --> F[Schema Validation Guards]\n    F -->|Enforce Citations & Edges| G[Validated Triage Output]\n    \n    style B fill:#ffebee,stroke:#c62828\n    style G fill:#e8f5e9,stroke:#2e7d32\n    style D fill:#e3f2fd,stroke:#1565c0\n    style F fill:#e3f2fd,stroke:#1565c0",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 6,
+      "brand_consistency": 7,
+      "artifacts": 6
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-17/cover.png"
+  },
+  {
+    "slot_id": "sec-01-deconstructing-base-llm-vulnerability-ha",
+    "is_cover": false,
+    "heading": "Deconstructing Base LLM Vulnerability Hallucinations in Smali Code",
+    "core_technical_idea": "Visualizing how a base LLM lacks inter-procedural context when analyzing isolated Smali register loads, resulting in severe false positives on JNI bindings.",
+    "visual_type": "diagram",
+    "must_show": [
+      "apktool disassembly to Smali code",
+      "isolated base LLM triage step",
+      "hallucinated CWE-321 cryptographic vulnerability",
+      "actual runtime reality involving C++ JNI shared library and Android Keystore"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A top-down flowchart showing the divergent paths between base LLM isolated analysis (leading to hallucination) and the actual multi-layered runtime execution flow.",
+    "alt_text": "Architectural diagram comparing base LLM isolated Smali analysis against actual JNI runtime execution, highlighting the origin of cryptographic hallucinations.",
+    "caption": "Isolated Smali ingestion strips architectural context, forcing base LLMs to mistake benign register strings for cryptographic keys.",
+    "mermaid_code": "flowchart TD\n    A[APK File] -->|apktool disassemble| B[Smali Bytecode\nregisters: v0, p1]\n    B --> C[Base LLM Ingestion\nIsolated Context]\n    C -->|Flags register load as hardcoded key| D[False Positive: CWE-321\nInsecure Cryptographic Key]\n    \n    B --> E[Actual Runtime Architecture]\n    E --> F[C++ Native Shared Library\n.so / JNI Binding]\n    F --> G[Android Keystore\nSecure Key Exchange]\n    \n    style D fill:#ffcccc,stroke:#cc0000,stroke-width:2px\n    style G fill:#ccffcc,stroke:#00cc00,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-17/sec-01-deconstructing-base-llm-vulnerability-ha.png"
+  },
+  {
+    "slot_id": "sec-02-injecting-api-call-graph-constraints-int",
+    "is_cover": false,
+    "heading": "Injecting API Call-Graph Constraints into the Vector Retrieval Pipeline",
+    "core_technical_idea": "Two-phase vector retrieval combining deterministic call-graph dependency traversal with constrained vector similarity search to eliminate out-of-context retrieval drift.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Target Method Chunk: processPayload()",
+      "Static Call Graph Vector Filter",
+      "Class Initializer: <clinit>",
+      "Native Registration: initializeCipher()",
+      "Combined Vector Context",
+      "LLM Triage Inference"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down pipeline layout showing branching deterministic dependency resolution followed by convergence into combined vector context and LLM inference.",
+    "alt_text": "Flowchart depicting the graph-constrained vector retrieval pipeline, showing target method chunking, static call graph filtering of class initializers and native registrations, combined context, and LLM triage inference.",
+    "caption": "Graph-constrained retrieval enforces deterministic code dependencies over loose textual similarity.",
+    "mermaid_code": "flowchart TD\n    A[Target Method Chunk: processPayload()] --> B(Static Call Graph Vector Filter)\n    B --> C[Class Initializer: clinit]\n    B --> D[Native Registration: initializeCipher()]\n    C --> E[Combined Vector Context]\n    D --> E\n    E --> F[LLM Triage Inference]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 5,
+      "technical_fidelity": 4,
+      "aesthetic_quality": 4,
+      "brand_consistency": 8,
+      "artifacts": 3
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-17/sec-02-injecting-api-call-graph-constraints-int.png"
+  },
+  {
+    "slot_id": "sec-03-building-the-smali-parsing-and-dependenc",
+    "is_cover": false,
+    "heading": "Building the Smali Parsing and Dependency Graph Extraction Engine",
+    "core_technical_idea": "The state machine and parsing pipeline for extracting method definitions and invoke edges from raw Smali files into a serialized call graph.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Raw Smali file input stream",
+      "Regex matching for class and method boundaries",
+      "Invocation instruction parsing (invoke-virtual, invoke-static, etc.)",
+      "Call graph dictionary construction and JSON serialization"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom pipeline flow showing line-by-line parsing leading to structured graph output.",
+    "alt_text": "Architectural diagram showing the Smali parsing pipeline, from raw file input and regex matching to method extraction and call graph JSON serialization.",
+    "caption": "Parsing pipeline converting unstructured Smali text into structured method nodes and resolved invocation edges.",
+    "mermaid_code": "flowchart TD\n    A[Raw .smali Files] --> B[Line-by-Line Iteration]\n    B --> C{Class Pattern Match?}\n    C -->|Yes| D[Track current_class]\n    C -->|No| E{Method Start Match?}\n    D --> E\n    E -->|Yes| F[Initialize Method Header & Body]\n    E -->|No| G{In Method Context?}\n    F --> G\n    G -->|Yes| H[Search Invoke Pattern: invoke-virtual/static/etc.]\n    H --> I[Extract Target Identifier]\n    I --> J[Add to self.call_graph]\n    H --> K{Method End Match?}\n    G --> K\n    K -->|Yes| L[Instantiate SmaliMethod Object]\n    L --> M[Store in self.classes & Serialize to JSON]\n    K -->|No| G",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-17/sec-03-building-the-smali-parsing-and-dependenc.png"
+  },
+  {
+    "slot_id": "sec-04-quantifying-the-64-reduction-in-false-po",
+    "is_cover": false,
+    "heading": "Quantifying the 64% Reduction in False Positives Against Benchmark APKs",
+    "core_technical_idea": "Demonstrating the sharp decrease in false positives and corresponding rise in precision across the three triage pipeline configurations (Base LLM, Naive Similarity RAG, and Graph-Constrained RAG).",
+    "visual_type": "chart",
+    "must_show": [
+      "False Positive counts for Base LLM (1236), Naive RAG (801), and Graph-Constrained RAG (442)",
+      "Precision percentage progression (12.96% to 18.26% to 39.81%)",
+      "Clear visual mapping of the 64.24% false positive reduction metric"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Dual-axis or grouped bar chart displaying absolute finding counts (True Positives vs False Positives) alongside the secondary precision metric line across pipeline configurations.",
+    "alt_text": "Bar chart comparing True Positives and False Positives across Unaugmented Base LLM, Naive Similarity RAG, and Graph-Constrained RAG pipelines, highlighting the 64.24% drop in false positives.",
+    "caption": "Graph-constrained RAG prunes noise effectively, cutting false positives by 64.24% while maintaining high true positive recovery.",
+    "mermaid_code": "",
+    "chart_spec": {
+      "chart_type": "bar",
+      "title": "Triage Pipeline Findings & False Positive Reduction",
+      "x_label": "Pipeline Configuration",
+      "y_label": "Count",
+      "series": [
+        {
+          "name": "True Positives (TP)",
+          "x": [
+            "Unaugmented Base LLM",
+            "Naive Similarity RAG",
+            "Graph-Constrained RAG"
+          ],
+          "y": [
+            184,
+            179,
+            176
+          ]
+        },
+        {
+          "name": "False Positives (FP)",
+          "x": [
+            "Unaugmented Base LLM",
+            "Naive Similarity RAG",
+            "Graph-Constrained RAG"
+          ],
+          "y": [
+            1236,
+            801,
+            442
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "x": "Graph-Constrained RAG",
+          "y": 442,
+          "text": "-64.24% FP Reduction (39.81% Precision)"
+        }
+      ]
+    },
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 9,
+      "brand_consistency": 10,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-17/sec-04-quantifying-the-64-reduction-in-false-po.png"
+  },
+  {
+    "slot_id": "sec-05-enforcing-output-validation-via-structur",
+    "is_cover": false,
+    "heading": "Enforcing Output Validation via Structural Schema Guardrails",
+    "core_technical_idea": "Pipeline data flow showing how the TriageOutputValidator intercepts raw LLM JSON, strips ungrounded assertions by cross-referencing static call graphs, and drops hallucinations before ingestion.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Raw LLM JSON input",
+      "JSON Schema & Key Validation",
+      "Static Call Graph Cross-Reference",
+      "Valid Report Output vs Rejected Hallucination"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Linear left-to-right processing pipeline with a branching decision node that filters invalid graph edges.",
+    "alt_text": "Flowchart depicting the structural validation pipeline for LLM outputs against a static call graph.",
+    "caption": "The validation pipeline rejects hallucinated execution paths by strictly matching every call-graph proof edge against known static references.",
+    "mermaid_code": "flowchart LR\n    A[Raw LLM JSON Output] --> B{JSON Decodable & Key Check?}\n    B -- No --> E[Reject: Malformed JSON]\n    B -- Yes --> C{Target Method Exists?}\n    C -- No --> E\n    C -- Yes --> D{Call Graph Proof Valid?}\n    D -- No --> F[Reject: Hallucinated Path]\n    D -- Yes --> G[Accept: VulnerabilityReport]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-17/sec-05-enforcing-output-validation-via-structur.png"
+  }
+]
