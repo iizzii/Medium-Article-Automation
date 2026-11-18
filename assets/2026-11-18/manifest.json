@@ -1,0 +1,381 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Why Play Integrity and Fingerprinting Fail Against Emulator Farms",
+    "core_technical_idea": "Defense-in-depth architecture shifting trust from compromised client-side hardware attestation to server-side TLS fingerprinting and behavioral velocity rules.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Compromised Client Layer (Custom Kernel / Frida Hooks)",
+      "API Gateway / TLS Fingerprinting (ClientHello inspection)",
+      "Server-Side Defense Layer (Velocity rules & spatial touch variance)",
+      "Bypassed Play Integrity API verdict"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom data flow illustrating client-side spoofing being intercepted and neutralized by server-side transport and behavioral inspection.",
+    "alt_text": "Flowchart contrasting bypassed client-side Play Integrity checks with robust server-side TLS fingerprinting and velocity validation.",
+    "caption": "Transitioning from fallible client attestation to immutable server-side transport and behavioral validation.",
+    "mermaid_code": "flowchart TD\n    subgraph Client [Compromised Host]\n        A[Emulator / Custom ROM] -->|Frida Hooks| B[Play Integrity API]\n        B -->|Forged Attestation Verdict| C[Client HTTP Request]\n    end\n\n    subgraph Gateway [API Gateway / Edge]\n        C -->|Raw ClientHello| D{TLS Fingerprinting}\n        D -->|Mismatch: Python/QEMU Stack| E[Immediate Drop / Challenge]\n        D -->|Valid Native TLS Stack| F[Forward to Backend]\n    end\n\n    subgraph Server [Backend Security Engine]\n        F --> G[Sliding-Window Velocity Rules]\n        F --> H[Spatial Touch Variance Analysis]\n        G & H --> I{Fraud Detected?}\n        I -->|Yes| J[Block Session]\n        I -->|No| K[Authorize Request]\n    end",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/cover.png"
+  },
+  {
+    "slot_id": "sec-01-evaluating-client-attestation-failure-ra",
+    "is_cover": false,
+    "heading": "Evaluating Client Attestation Failure Rates Under High-Volume Fraud Base Rates",
+    "core_technical_idea": "Attestation relay attack architecture where hypervisor-controlled emulators delegate TEE hardware signing challenges to a cluster of physical devices",
+    "visual_type": "diagram",
+    "must_show": [
+      "Target app running inside QEMU/KVM emulator",
+      "Kernel-level syscall interception of keystore2/hwservicemanager",
+      "Attestation Relay Server routing challenges",
+      "Physical rooted Android device executing TEE hardware key signing",
+      "Valid attestation token delivered back to application backend"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Horizontal sequence diagram flowing left-to-right from the emulated client environment through the kernel boundary, over the relay infrastructure to the physical TEE hardware, and back up to the verification backend.",
+    "alt_text": "Sequence diagram illustrating an attestation relay attack flow where an emulator intercepts system calls and delegates hardware-backed attestation signing to a physical device with a real TEE.",
+    "caption": "Attestation Relay Attack: How emulated clients bypass hardware root-of-trust by delegating TEE signing challenges to physical devices.",
+    "mermaid_code": "sequenceDiagram\n    autonumber\n    participant App as Target App (Emulator)\n    participant Kernel as Hypervisor / Custom ROM Kernel\n    participant Relay as Attestation Relay Server\n    participant PhysDevice as Physical Device (TEE)\n    participant Backend as Application Server\n\n    App->>Kernel: Request Attestation (keystore2 Syscall)\n    Kernel->>Relay: Intercept & Forward Nonce Payload\n    Relay->>PhysDevice: Push Signing Request to Device Pool\n    PhysDevice->>PhysDevice: Hardware Keymaster Signs Nonce in TEE\n    PhysDevice-->>Relay: Valid Certificate Chain + Signature\n    Relay-->>Kernel: Return Signed Attestation Response\n    Kernel-->>App: Deliver Valid Payload (MEETS_STRONG_INTEGRITY)\n    App->>Backend: Submit API Request + Relay-Signed Payload\n    Backend->>Backend: Verify Signature (Passes Root-of-Trust Check)",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-01-evaluating-client-attestation-failure-ra.png"
+  },
+  {
+    "slot_id": "sec-02-bypassing-play-integrity-flags-via-custo",
+    "is_cover": false,
+    "heading": "Bypassing Play Integrity Flags via Custom Kernel Drivers and Frida Hooking",
+    "core_technical_idea": "Multi-layered interception architecture where custom kernel drivers manipulate low-level system paths and runtime hooks intercept binder/libc property queries to spoof device integrity.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Application Process",
+      "system_server / keystore2",
+      "Custom Linux Kernel (eBPF / KernelSU)",
+      "Hardware Hypervisor (KVM)",
+      "Frida / Inline C-Hooks",
+      "Virtual File System alterations"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom stratified system architecture flow diagram illustrating the dual interception points at the runtime layer (Frida/C-Hooks) and kernel layer (KernelSU/VFS).",
+    "alt_text": "Architectural diagram showing how emulator detection checks pass through Frida runtime hooks and KernelSU VFS filters before reaching hardware.",
+    "caption": "Dual-layer interception: runtime hooks rewrite application property requests while kernel drivers transparently sanitize filesystem queries.",
+    "mermaid_code": "flowchart TD\n    App[Application Process] -->|Binder IPC / JWS| Runtime[Runtime Layer: Frida / Inline C-Hooks]\n    subgraph Runtime_Interception [Runtime Hooking Layer]\n        Runtime -->|__system_property_get| Prop[Spoofed ro.boot properties / Harvested JWS Tokens]\n    end\n    Prop --> SysServer[system_server / keystore2]\n    SysServer -->|System Call| Kernel[Custom Linux Kernel: KernelSU / eBPF]\n    subgraph Kernel_Interception [Kernel VFS Layer]\n        Kernel -->|sys_read / sys_fstat| VFS[Sanitized Files: /proc/cpuinfo, /proc/mounts]\n    end\n    VFS --> KVM[Hardware Hypervisor / QEMU Base]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-02-bypassing-play-integrity-flags-via-custo.png"
+  },
+  {
+    "slot_id": "sec-03-comparing-vendor-signal-promises-against",
+    "is_cover": false,
+    "heading": "Comparing Vendor Signal Promises Against Operational Emulator Evasion Capabilities",
+    "core_technical_idea": "Contrast client-side static telemetry vendor promises with advanced bot farm evasion realities and actual mitigation efficacy.",
+    "visual_type": "table_card",
+    "must_show": [
+      "Telemetry Signal names",
+      "Vendor Promise descriptions",
+      "Operational Reality in Bot Farms",
+      "Mitigation Efficacy ratings from Zero to Critical"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A structured multi-column data matrix clearly separating client-side vulnerabilities from network and server-side defenses.",
+    "alt_text": "Comparison table contrasting telemetry vendor promises against operational bot farm evasion techniques and mitigation efficacy.",
+    "caption": "Client-side telemetry signals suffer from severe evasion vulnerabilities, leaving network edge and server-side sliding velocity as critical defenses.",
+    "mermaid_code": "",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": {
+      "headers": [
+        "Telemetry Signal",
+        "Vendor Promise",
+        "Operational Reality in Bot Farms",
+        "Mitigation Efficacy"
+      ],
+      "rows": [
+        [
+          "Hardware Key Attestation",
+          "Guarantees genuine hardware root-of-trust via TEE signed keys.",
+          "Relayed via remote physical device hardware farms or intercepted at the Binder layer.",
+          "Low"
+        ],
+        [
+          "Build Properties (ro.product.*)",
+          "Distinguishes physical hardware specs from generic emulator strings.",
+          "Injected at kernel boot time or hooked via C-level __system_property_get.",
+          "Zero"
+        ],
+        [
+          "GL Renderer & GPU String",
+          "Identifies SwiftShader, ARM Mali, or Adreno rendering pipelines.",
+          "GPU pass-through (virgl / ANGLE) presents true Adreno/Mali drivers to the OS.",
+          "Low"
+        ],
+        [
+          "Sensor Jitter Dynamics",
+          "Detects lack of real accelerometer and gyroscope motion vectors.",
+          "Synthetic noise generators playback realistic physical sensor traces via HAL hooks.",
+          "Medium"
+        ],
+        [
+          "SafetyNet / Play Integrity Verdicts",
+          "Evaluates overall OS modification, root state, and bootloader status.",
+          "Bypassed via PlayIntegrityFix, custom kernels, and patched framework jars.",
+          "Low"
+        ],
+        [
+          "TLS Client Hello Fingerprint",
+          "Asserts structural HTTP client implementation details.",
+          "Hard to spoof accurately inside custom Android apps using non-standard network stacks.",
+          "High"
+        ],
+        [
+          "Server-Side Sliding Velocity",
+          "Flags abnormal transaction rates per subnet/device fingerprint cluster.",
+          "Cannot be tampered with by client-side hooks, kernels, or emulator frameworks.",
+          "Critical"
+        ]
+      ]
+    },
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 6,
+      "aesthetic_quality": 6,
+      "brand_consistency": 9,
+      "artifacts": 4
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-03-comparing-vendor-signal-promises-against.png"
+  },
+  {
+    "slot_id": "sec-04-common-pitfalls-in-client-attestation-im",
+    "is_cover": false,
+    "heading": "Common Pitfalls in Client Attestation Implementation",
+    "core_technical_idea": "Expose the structural security failures in client attestation pipelines from client-side integrity blocking to unverified signature chains, unbound nonces, and static fingerprint hashing.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Synchronous client-side integrity blocking",
+      "Unverified signature chains on server",
+      "Missing request-to-token nonce binding",
+      "Static device fingerprint hashing"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A top-down flowchart contrasting vulnerable anti-pattern pathways against secure verification steps across client and server boundaries.",
+    "alt_text": "Architectural diagram mapping four core client attestation anti-patterns including client-side branching bypass, unverified CA chains, unbound nonces, and static hashing.",
+    "caption": "Mapping operational anti-patterns in client attestation reveals how decoupled validation logic on clients and backends allows trivial bypasses.",
+    "mermaid_code": "flowchart TD\n    subgraph Client [Client-Side Anti-Patterns]\n        C1[1. Synchronous Integrity Blocking] -->|Attacker hooks return true| C2[App Logic Bypassed]\n        C3[4. Static Device Fingerprinting] -->|Spoofed/Randomized| C4[Static SHA-256 Hash]\n    end\n\n    subgraph Server [Server-Side Anti-Patterns]\n        S1[2. Unverified JWS Payload] -->|Skips Google CA Check| S2[Arbitrary JSON Accepted]\n        S3[3. Unbound Nonce] -->|Missing Request Hash| S4[Replay Attack Vector]\n    end\n\n    Client --> Server\n    style Client fill:#1e1e1e,stroke:#ff5555,stroke-width:2px,color:#fff\n    style Server fill:#1e1e1e,stroke:#ff5555,stroke-width:2px,color:#fff",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-04-common-pitfalls-in-client-attestation-im.png"
+  },
+  {
+    "slot_id": "sec-05-extracting-network-layer-signals-using-t",
+    "is_cover": false,
+    "heading": "Extracting Network-Layer Signals Using TLS Client Hello Fingerprinting",
+    "core_technical_idea": "The pipeline of capturing TLS ClientHello packets at the Network Edge, parsing cryptographic attributes, computing the JA3 hash, and evaluating legitimacy against known baselines.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Network Edge / API Gateway",
+      "TLS ClientHello packet capture",
+      "Parameter extraction (Version, Cipher Suites, Extensions, GREASE)",
+      "JA3 Hash Generation",
+      "Baseline comparison (Android vs Python/Go bots)"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Linear left-to-right flow starting from incoming client requests at the Network Edge, passing through packet parsing, hashing, and culminating in a decision node (ALLOW vs BLOCK/CHALLENGE).",
+    "alt_text": "Architectural diagram showing network edge TLS ClientHello inspection, JA3 hash calculation, and automated bot detection.",
+    "caption": "Edge-based TLS inspection pipeline translating raw cryptographic parameters into deterministic JA3 fingerprints for automated threat mitigation.",
+    "mermaid_code": "flowchart TD\n    A[Client Request] -->|TLS ClientHello| B(Network Edge / API Gateway)\n    subgraph Inspection Pipeline\n        B --> C[Extract Version, Ciphers, Extensions, GREASE]\n        C --> D[Filter GREASE & Concatenate Parameters]\n        D --> E[Generate JA3 MD5 Hash]\n    end\n    E --> F{Compare with Baselines}\n    F -->|b32309a... (Android OkHttp)| G[ALLOW: Legitimate Client]\n    F -->|7715705... (Python requests)| H[BLOCK: Automated Script]\n    F -->|0686943... (Go-http-client)| I[BLOCK: Automated Bot]\n    F -->|Unknown Hash| J[CHALLENGE / BLOCK]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 7,
+      "technical_fidelity": 6,
+      "aesthetic_quality": 5,
+      "brand_consistency": 8,
+      "artifacts": 4
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-05-extracting-network-layer-signals-using-t.png"
+  },
+  {
+    "slot_id": "sec-06-enforcing-sliding-window-velocity-rules-",
+    "is_cover": false,
+    "heading": "Enforcing Sliding-Window Velocity Rules and Touch Mechanics on Backend APIs",
+    "core_technical_idea": "Pipeline showing how backend APIs evaluate request velocity via sliding windows and spatial touch variance to filter out automated emulator farms.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Incoming API Request Payload",
+      "Sliding-Window Velocity Check",
+      "Spatial Variance Analysis of Touch Input",
+      "Emulator Farm Block / Human Allow Decision"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right processing pipeline illustrating the dual-check validation architecture for incoming requests.",
+    "alt_text": "Architectural diagram showing incoming API requests branching into sliding-window velocity checks and touch mechanics spatial variance analysis before reaching the backend engine.",
+    "caption": "Dual-gate backend evaluation combining sliding-window velocity tracking with spatial touch variance analysis.",
+    "mermaid_code": "flowchart TD\n    Req[Incoming API Request] --> VEngine[Sliding-Window Velocity Engine]\n    Req --> MEngine[Spatial Variance Touch Engine]\n    \n    VEngine -->|Exceeds max_requests / window_seconds| Block1([Flag: Velocity Breach])\n    VEngine -->|Within Limit| Pass1{Velocity OK}\n    \n    MEngine -->|Zero Variance / Linear ADB Vector| Block2([Flag: Emulator Detected])\n    MEngine -->|High Natural Curve Variance| Pass2{Mechanics OK}\n    \n    Pass1 --> Final[API Request Authorized]\n    Pass2 --> Final\n    \n    Block1 --> Drop([Reject Request])\n    Block2 --> Drop\n    \n    style Final fill:#d4edda,stroke:#28a745,color:#155724\n    style Drop fill:#f8d7da,stroke:#dc3545,color:#721c24",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-06-enforcing-sliding-window-velocity-rules-.png"
+  },
+  {
+    "slot_id": "sec-07-try-it-yourself",
+    "is_cover": false,
+    "heading": "Try It Yourself",
+    "core_technical_idea": "A step-by-step security testing workflow for mobile API infrastructure, moving from custom rooted emulator setup through TLS interception to Play Integrity token replay analysis.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Custom Emulator Instance (AVD with KernelSU/Magisk)",
+      "TLS Interception (Burp Suite/mitmproxy comparing native vs Python scripts)",
+      "Play Integrity Token Replay (captured from physical device via Frida)",
+      "Backend Evaluation (Nonce request-binding and velocity limits check)"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom workflow pipeline showing the three testing phases feeding into a final backend security validation gate.",
+    "alt_text": "Flowchart illustrating the mobile API infrastructure testing process, starting from custom AVD setup, through TLS traffic interception, to Play Integrity token replay testing against backend controls.",
+    "caption": "Step-by-step testing pipeline to audit mobile API defenses against emulator bypass and token replay attacks.",
+    "mermaid_code": "flowchart TD\n    subgraph Phase1 [1. Custom Emulator Instance]\n        A[AVD x86_64 System Image] --> B[Root via KernelSU or Magisk]\n    end\n\n    subgraph Phase2 [2. TLS Interception]\n        B --> C[Route via Burp Suite or mitmproxy]\n        C --> D[Compare Native Network vs Python Scripts]\n    end\n\n    subgraph Phase3 [3. Replay Integrity Tokens]\n        D --> E[Capture Physical Device Token via Frida]\n        E --> F[Replay Token in Emulator Request]\n    end\n\n    subgraph Evaluation [Backend Security Check]\n        F --> G{Server Accepts Request?}\n        G -->|Yes| H[Vulnerable: Lacks Nonce Binding & Velocity Limits]\n        G -->|No| I[Secure: Controls Enforced]\n    end\n\n    style Phase1 fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc\n    style Phase2 fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc\n    style Phase3 fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc\n    style Evaluation fill:#0f172a,stroke:#f43f5e,stroke-width:2px,color:#f8fafc",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-07-try-it-yourself.png"
+  },
+  {
+    "slot_id": "sec-08-moving-beyond-endpoint-trust",
+    "is_cover": false,
+    "heading": "Moving Beyond Endpoint Trust",
+    "core_technical_idea": "Shifting verification from compromised client-side integrity attestations to multi-layered network-layer controls at the API Gateway.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Compromised Host with Hypervisor and Kernel hooks",
+      "Client-side integrity signals being synthesized or relayed",
+      "API Gateway interception point",
+      "Network-layer verification controls: TLS ClientHello fingerprinting, server-side sliding velocity limiters, and micro-variance gesture mechanics"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom flowchart contrasting the single point of failure of client-side attestation against the robust, multi-faceted network-layer inspection at the API Gateway.",
+    "alt_text": "Architecture diagram illustrating how compromised client-side attestations fail against network-layer controls like TLS ClientHello fingerprinting, velocity limiters, and micro-variance gesture mechanics at the API Gateway.",
+    "caption": "Transitioning from vulnerable client-side trust to robust network-layer validation at the API Gateway.",
+    "mermaid_code": "flowchart TD\n    subgraph Compromised_Endpoint [Compromised Host]\n        H[Hypervisor / Kernel]\n        C[Client-side Attestation]\n        H -->|Hooks & Relays| C\n    end\n\n    C -->|Synthesized Signals| GW[API Gateway Layer]\n\n    subgraph Network_Verification [Resilient Network-Layer Defenses]\n        GW --> T[TLS ClientHello Fingerprinting]\n        GW --> V[Server-Side Sliding Velocity Limiters]\n        GW --> M[Micro-Variance Gesture Mechanics]\n    end\n\n    T --> Auth[Authorized Operational Context]\n    V --> Auth\n    M --> Auth\n\n    style Compromised_Endpoint fill:#ffe6e6,stroke:#ff4d4d,stroke-width:2px\n    style Network_Verification fill:#e6f2ff,stroke:#3399ff,stroke-width:2px\n    style Auth fill:#e6ffed,stroke:#28a745,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-18/sec-08-moving-beyond-endpoint-trust.png"
+  }
+]
