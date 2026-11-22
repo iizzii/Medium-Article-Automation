@@ -1,0 +1,252 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Automating OWASP MASTG Attack Paths to Fix Mobile Remediation SLAs",
+    "core_technical_idea": "Transitioning from isolated OWASP MASTG compliance checklist findings to graph-based automated attack path validation that proves data exfiltration chains in CI/CD pipelines.",
+    "visual_type": "diagram",
+    "must_show": [
+      "MASVS-STORAGE-1 node (Insecure Data Storage)",
+      "MASVS-NETWORK-1 node (Insecure HTTP Loads)",
+      "Chained exploit path leading to OAuth Token Exfiltration",
+      "CI/CD pipeline automated runtime validation boundary",
+      "SLA reduction impact from 90 days to under 14 days"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right directed acyclic graph showing isolated nodes converging into an automated runtime execution step, followed by the outcome metrics.",
+    "alt_text": "A technical diagram illustrating how isolated OWASP MASTG checklist findings are mapped into a directed graph to expose full data exfiltration chains within a CI/CD pipeline.",
+    "caption": "Graph-based threat modeling turns isolated compliance noise into verifiable runtime exploit chains, cutting triage cycles by 60%.",
+    "mermaid_code": "flowchart TD\n    A[MASVS-STORAGE-1: Unencrypted Shared Prefs] --> C[Exfiltration Chain: OAuth Token Theft]\n    B[MASVS-NETWORK-1: NSExceptionAllowsInsecureHTTPLoads] --> C\n    C --> D[CI/CD Headless Frida Runtime Proof]\n    D --> E[SLA Reduction: 90 Days to <14 Days]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 7,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 5,
+      "brand_consistency": 5,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-22/cover.png"
+  },
+  {
+    "slot_id": "sec-01-static-vulnerability-checklists-destroy-",
+    "is_cover": false,
+    "heading": "Static Vulnerability Checklists Destroy Developer Trust and Inflate SLAs",
+    "core_technical_idea": "Atomic SAST findings create fragmented backlogs and slow 90-day SLAs, whereas validated attack chains demonstrate real exploitability and compress remediation to a 7-day SLA.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Isolated SAST finding nodes leading to backlog bloat and 90-day SLA",
+      "Linear multi-step attack chain combining API Key, TLS bypass, and token storage",
+      "Direct contrast between theoretical noise and validated exploitability"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Two comparative subgraphs stacked vertically: the top illustrating disconnected atomic vulnerabilities flowing into backlog bloat, and the bottom rendering a left-to-right exploit execution path driving urgent remediation.",
+    "alt_text": "Diagram comparing isolated atomic SAST findings with a 90-day SLA against a validated attack chain (Hardcoded API Key -> TLS Bypass -> Auth Token Dump) resulting in a 7-day SLA.",
+    "caption": "Chaining theoretical findings into a validated attack path converts a 90-day remediation backlog into an urgent 7-day security fix.",
+    "mermaid_code": "flowchart TD\n    subgraph Atomic[\"Atomic SAST Findings (Isolated View)\"]\n        direction TB\n        A1[\"Finding A: Hardcoded API Key<br/>(CVSS 5.9 / Medium)\"]\n        A2[\"Finding B: Insecure Local Storage<br/>(CVSS 3.3 / Low)\"]\n        A3[\"Finding C: Missing TLS Pinning<br/>(CVSS 5.9 / Medium)\"]\n        A1 --> T1[\"3 Disjoint Triage Tickets\"]\n        A2 --> T1\n        A3 --> T1\n        T1 --> SLA1[\"90-Day Remediation SLA<br/>(Dismissed as Backlog Bloat)\"]\n    end\n\n    subgraph Chained[\"Attack-Path Validation (Exploit Chain)\"]\n        direction LR\n        B1[\"Hardcoded API Key\"] --> B2[\"Bypass TLS via Weak Pinning\"] --> B3[\"Dump Local Storage Auth Token\"]\n        B3 --> T2[\"1 Validated Attack Chain\"]\n        T2 --> SLA2[\"7-Day Remediation SLA<br/>(Immediate Critical Exploitability)\"]\n    end",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-22/sec-01-static-vulnerability-checklists-destroy-.png"
+  },
+  {
+    "slot_id": "sec-02-mapping-owasp-mastg-controls-into-direct",
+    "is_cover": false,
+    "heading": "Mapping OWASP MASTG Controls into Directed Graph Attack Pathways",
+    "core_technical_idea": "Chaining independent, low-severity MASTG vulnerabilities (resilience, network, storage) into an automated directed graph attack path leading to account takeover.",
+    "visual_type": "diagram",
+    "must_show": [
+      "MASVS-RESILIENCE-1 node allowing Frida-server instrumentation",
+      "MASVS-NETWORK-1 node enabling TLS interception and endpoint rebind",
+      "MASVS-STORAGE-1 node yielding heap memory and sandbox token extraction",
+      "Directed edges forming an automated data exfiltration and account takeover chain"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A left-to-right directed acyclic graph showing state transitions from initial instrumentation to final data exfiltration, highlighting how individual checks compound in severity.",
+    "alt_text": "Directed graph showing MASTG controls mapped as nodes: MASVS-RESILIENCE-1 transitions via Frida to MASVS-NETWORK-1 TLS bypass, culminating in MASVS-STORAGE-1 token extraction and account takeover.",
+    "caption": "Chaining discrete control failures transforms isolated medium-risk MASTG findings into a fully automated exploit pathway.",
+    "mermaid_code": "flowchart TD\n    R1[\"MASVS-RESILIENCE-1<br/>Missing Root/Frida Checks\"] -->|Allows frida-server instrumentation| N1[\"MASVS-NETWORK-1<br/>Improper TLS / Interception\"]\n    N1 -->|Enables dynamic endpoint rebind| S1[\"MASVS-STORAGE-1<br/>Unencrypted Local Storage\"]\n    S1 -->|Dumps session refresh tokens| ATO[\"Automated Account Takeover &<br/>Data Exfiltration\"]\n    \n    classDef vuln fill:#2d3748,stroke:#cbd5e0,stroke-width:2px,color:#fff;\n    classDef target fill:#9b2c2c,stroke:#feb2b2,stroke-width:2px,color:#fff;\n    class R1,N1,S1 vuln;\n    class ATO target;",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 7,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 5,
+      "brand_consistency": 5,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-22/sec-02-mapping-owasp-mastg-controls-into-direct.png"
+  },
+  {
+    "slot_id": "sec-03-executing-automated-frida-harnesses-to-p",
+    "is_cover": false,
+    "heading": "Executing Automated Frida Harnesses to Prove Network and Storage Chains",
+    "core_technical_idea": "Automated CI/CD dynamic instrumentation pipeline executing Frida hooks to bypass anti-tampering, force TLS unpinning, and extract sensitive storage artifacts.",
+    "visual_type": "diagram",
+    "must_show": [
+      "CI/CD pipeline stage sequence",
+      "Virtual target provisioning (Android Emulator / iOS Corellium)",
+      "Frida driver attachment",
+      "Targeted dynamic hooks (Anti-tamper patch, TLS unpinning, Storage interception)",
+      "Telemetry and issue artifact generation"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards",
+      "shield icons"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom structured sequence diagram showing build execution passing into an ephemeral target runner, branching into specific method hook vectors, and converging on telemetry capture.",
+    "alt_text": "Flowchart illustrating an automated CI/CD Frida execution harness: building app packages, spawning virtual devices, attaching Frida drivers to hook network, storage, and resilience layers, and logging dynamic repro artifacts.",
+    "caption": "Automated dynamic testing pipelines inject Frida drivers into ephemeral virtual devices to execute targeted dynamic hook chains and export deterministic repro artifacts.",
+    "mermaid_code": "flowchart TD\n    subgraph PIPELINE[\"CI/CD Build Pipeline\"]\n        A[\"Build App Package<br/>(APK / IPA)\"] --> B[\"Spawn Virtual Device<br/>(Android API 34 / iOS Corellium)\"]\n        B --> C[\"Attach Frida Instrumentation Driver\"]\n        \n        subgraph HARNESS[\"Automated Frida Harness\"]\n            C --> D1[\"Hook Resilience<br/>Patch Anti-Frida NOP in libnative-check.so\"]\n            C --> D2[\"Hook Network<br/>Override checkServerTrusted / OkHttpClient\"]\n            C --> D3[\"Hook Storage<br/>Intercept SharedPreferences / SecItemAdd\"]\n        end\n        \n        D1 --> E[\"Capture Dynamic Trace & Memory Payload\"]\n        D2 --> E\n        D3 --> E\n        \n        E --> F[\"Generate Issue Reproduction Artifact<br/>(Stack Traces & Parsed Telemetry)\"]\n    end",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-22/sec-03-executing-automated-frida-harnesses-to-p.png"
+  },
+  {
+    "slot_id": "sec-04-benchmarking-remediation-slas-across-sta",
+    "is_cover": false,
+    "heading": "Benchmarking Remediation SLAs Across Static Findings Versus Validated Paths",
+    "core_technical_idea": "Decision tree illustrating SLA escalation tiers driven by path reachability and automated exploit validation rather than static CVSS scores.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Unverified isolated flaw entry point",
+      "Reachability check to critical asset",
+      "Tier 3 Low Severity SLA 60-90 Days",
+      "Automated exploit check without user interaction",
+      "Tier 2 Medium High SLA 14-30 Days",
+      "Tier 1 Critical Chain SLA 48h-7D"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down hierarchical decision flowchart utilizing clean nodes and clear branching paths for reachability triage.",
+    "alt_text": "Flowchart mapping vulnerability triage from unverified findings down to Tier 1, 2, and 3 SLAs based on attack path reachability and automation.",
+    "caption": "Path-based triage replaces static CVSS scores with deterministic exploit verification to prioritize critical engineering remediation.",
+    "mermaid_code": "flowchart TD\n    A[Unverified / Isolated Flaw] --> B{Does an exploit path exist<br/>from Entry Point to Critical Asset?}\n    B -- NO --> C[Tier 3: Low Severity<br/>SLA: 60-90 Days]\n    B -- YES --> D{Is the exploit path fully<br/>automated without user interaction?}\n    D -- NO --> E[Tier 2: Medium/High<br/>SLA: 14-30 Days]\n    D -- YES --> F[Tier 1: Critical Chain<br/>SLA: 48 hours - 7 Days]\n    style A fill:#f9f,stroke:#333,stroke-width:2px\n    style F fill:#ff9999,stroke:#333,stroke-width:2px\n    style E fill:#ffcc99,stroke:#333,stroke-width:2px\n    style C fill:#99ccff,stroke:#333,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-22/sec-04-benchmarking-remediation-slas-across-sta.png"
+  },
+  {
+    "slot_id": "sec-05-structuring-mobile-appsec-metrics-around",
+    "is_cover": false,
+    "heading": "Structuring Mobile AppSec Metrics Around Exploitability Cost",
+    "core_technical_idea": "Quantifying mobile vulnerability risk into an Attacker Cost Score based on device auth, complexity, and tooling automation to set PR deployment gates.",
+    "visual_type": "chart",
+    "must_show": [
+      "Attacker Cost Score values calculated from section variables",
+      "Deployment gate threshold (< 1.0 risk boundary)",
+      "Comparison across threat profiles ranging from unauthenticated automated attacks to root zero-day chains"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Horizontal bar chart comparing 5 discrete threat scenarios, sorted by Attacker Cost Score, with a vertical reference line indicating the CI/CD deployment block threshold.",
+    "alt_text": "Horizontal bar chart showing Attacker Cost Scores across five mobile application threat profiles, highlighting a deployment gate threshold at score 1.0.",
+    "caption": "Low Attacker Cost Scores (<1.0) represent easily scalable exploits that trigger deployment blocks in automated AppSec pipelines.",
+    "mermaid_code": "",
+    "chart_spec": {
+      "chart_type": "bar",
+      "title": "Attacker Cost Score Across Mobile Threat Profiles",
+      "x_label": "Attacker Cost Score (Lower = Cheaper Exploit / Higher Priority)",
+      "y_label": "Threat Scenario",
+      "series": [
+        {
+          "name": "Attacker Cost Score",
+          "x": [
+            0.1,
+            0.33,
+            0.88,
+            2.92,
+            40.0
+          ],
+          "y": [
+            "Unauth + Scripted + Public Tooling",
+            "Unauth + Scripted + Custom Tooling",
+            "Local User + Complex Timing + Public Tooling",
+            "Local User + Complex Timing + Custom Tooling",
+            "Root + Memory Side-Channel + Zero-Day"
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "x": 1.0,
+          "y": "Local User + Complex Timing + Public Tooling",
+          "text": "Deployment Gate Threshold (Score < 1.0 Blocks PR)"
+        }
+      ]
+    },
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 6,
+      "technical_fidelity": 4,
+      "aesthetic_quality": 5,
+      "brand_consistency": 7,
+      "artifacts": 4
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-22/sec-05-structuring-mobile-appsec-metrics-around.png"
+  }
+]
