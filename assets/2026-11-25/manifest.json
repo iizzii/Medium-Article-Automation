@@ -1,0 +1,258 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Deobfuscating DEX Loading Chains with Custom ClassLoader Hooks",
+    "core_technical_idea": "Intercepting in-memory DEX payload decryption at the ClassLoader.defineClass layer using Frida to dump and repair unencrypted Dalvik bytecode before execution.",
+    "visual_type": "diagram",
+    "must_show": [
+      "BaseDexClassLoader invocation",
+      "Frida hook at java.lang.ClassLoader.defineClass",
+      "Raw memory byte dump",
+      "Header repair steps (Magic, Adler-32, SHA-1)",
+      "Downstream YARA detection pipeline"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom structured flow diagram split into four logical execution layers: disk static state, runtime memory instantiation, Frida hook interception vector, and artifact repair/analysis pipeline.",
+    "alt_text": "Architecture diagram illustrating multi-stage Android malware DEX unpacking via Frida hooks on java.lang.ClassLoader.defineClass, memory dumping, header repair, and YARA rule analysis.",
+    "caption": "Intercepting memory payloads at java.lang.ClassLoader.defineClass captures decrypted Dalvik bytecode prior to runtime verification.",
+    "mermaid_code": "flowchart TD\n    subgraph S1[\"1. Disk & Packaging Layer\"]\n        A[\"Encrypted Secondary Payload\"] --> B[\"Custom BaseDexClassLoader Subclass\"]\n    end\n    subgraph S2[\"2. Dalvik Runtime Instantiation\"]\n        B --> C[\"In-Memory Decryption\"]\n        C --> D[\"java.lang.ClassLoader.defineClass()\"]\n    end\n    subgraph S3[\"3. Frida Interception Vector\"]\n        D -. \"Hook Byte Stream\" .-> E[\"Dump Raw Byte Array\"]\n        E --> F[\"Artifact Reconstruction Engine\"]\n        F --> F1[\"Fix Magic Bytes (DEX 035)\"]\n        F --> F2[\"Recalculate Adler-32 Checksum\"]\n        F --> F3[\"Recompute SHA-1 Signature\"]\n    end\n    subgraph S4[\"4. Threat Intelligence Pipeline\"]\n        F1 & F2 & F3 --> G[\"Repaired Unpacked DEX\"]\n        G --> H[\"Static Analysis & YARA Hunting\"]\n    end\n    style D stroke:#e74c3c,stroke-width:2px\n    style E stroke:#2ecc71,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/cover.png"
+  },
+  {
+    "slot_id": "sec-01-anatomy-of-multi-stage-reflection-and-cu",
+    "is_cover": false,
+    "heading": "Anatomy of Multi-Stage Reflection and Custom ClassLoaders",
+    "core_technical_idea": "Dynamic runtime execution of secondary malware payloads directly from memory via custom ClassLoaders and reflection, completely bypassing static filesystem detection.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Tier 1: Staging Container (Assets/PNG/C2)",
+      "Tier 2: In-Memory Decryption & InMemoryDexClassLoader",
+      "Tier 3: Reflection Engine (Class.forName and Method.invoke)",
+      "Execution boundary showing Zero Disk Writes vs Memory Execution"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Vertical flow diagram partitioned into visual blocks representing the three execution tiers, emphasizing the boundary between static disk storage and volatile RAM execution.",
+    "alt_text": "Architecture flowchart detailing the 3-stage dynamic payload execution pipeline: Staging container extraction, native in-memory DEX decryption via InMemoryDexClassLoader, and dynamic invocation through Java Reflection into the Dalvik/ART VM.",
+    "caption": "By decrypting byte arrays directly into dynamic memory and resolving entry points via reflection, advanced Android malware avoids leaving executable artifacts on the device filesystem.",
+    "mermaid_code": "flowchart TD\n    subgraph Tier1[\"Tier 1: Staging Container\"]\n        A[\"Encrypted Payload Data<br/>(Raw Asset / PNG / C2 Socket)\"]\n    end\n\n    subgraph MemoryBoundary[\"Volatile Memory Boundary (Zero Disk Footprint)\"]\n        subgraph Tier2[\"Tier 2: Custom ClassLoader\"]\n            B[\"Native JNI Decryption Routine\"]\n            C[\"Decrypted DEX Byte Array<br/>byte[] in RAM\"]\n            D[\"InMemoryDexClassLoader /<br/>BaseDexClassLoader\"]\n        end\n\n        subgraph Tier3[\"Tier 3: Reflection Engine\"]\n            E[\"java.lang.Class.forName()\"]\n            F[\"java.lang.reflect.Method.invoke()\"]\n        end\n\n        G[\"Dalvik / ART VM Runtime\"]\n    end\n\n    A -->|\"Pass Raw Bytes\"| B\n    B -->|\"Output Decrypted Bytes\"| C\n    C -->|\"Direct Memory Load\"| D\n    D -->|\"Instantiate Class\"| E\n    E -->|\"Resolve Method Address\"| F\n    F -->|\"Execute Bytecode\"| G\n\n    style MemoryBoundary stroke:#e74c3c,stroke-width:2px,stroke-dasharray: 5 5",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/sec-01-anatomy-of-multi-stage-reflection-and-cu.png"
+  },
+  {
+    "slot_id": "sec-02-architecting-frida-instrumentation-for-i",
+    "is_cover": false,
+    "heading": "Architecting Frida Instrumentation for In-Memory Payload Extraction",
+    "core_technical_idea": "Early-stage Frida instrumentation lifecycle showing how native Python process control and JS runtime hooks intercept in-memory DEX bytes at the ClassLoader boundary before execution.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Python Host Harness lifecycle (spawn, attach, load, resume)",
+      "Frida JS agent injection into Android Runtime (ART)",
+      "ClassLoader.defineClass method overload hook execution",
+      "IPC byte array transfer via send() message payload",
+      "SHA-256 calculation and DEX file persistence to local disk"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Sequence diagram progressing left-to-right from Host Python runner to Frida Agent, target ART Process, and local file storage.",
+    "alt_text": "Sequence diagram illustrating early instrumentation dynamic analysis, showing Frida Python spawner, JS runtime hook on ClassLoader.defineClass, raw byte extraction, IPC messaging, and DEX file writing.",
+    "caption": "Interception sequence showing early process attachment, ClassLoader hooking, and asynchronous buffer extraction to host disk before bytecode execution.",
+    "mermaid_code": "sequenceDiagram\n    autonumber\n    participant Host as Host Python Harness\n    participant Frida as Frida JS Runtime\n    participant ART as Android Runtime (Target PID)\n    participant Disk as Host Disk Storage\n\n    Host->>ART: device.spawn([PACKAGE_NAME])\n    Host->>Frida: create_script(javascript_code) & script.load()\n    Frida->>ART: Overload ClassLoader.defineClass(name, b, offset, length)\n    Host->>ART: device.resume(PID)\n    \n    Note over ART: App unpacking sequence triggers dynamic DEX loading\n    \n    ART->>Frida: Invoke defineClass(name, byte[], offset, length)\n    activate Frida\n    Frida->>Frida: Memory.readByteArray(b.rawPointer + offset, length)\n    Frida->>Host: send({type: 'dex_dump'}, buffer)\n    Frida->>ART: Execute original this.defineClass(...)\n    deactivate Frida\n    \n    activate Host\n    Host->>Host: Compute SHA-256 of extracted buffer\n    Host->>Disk: Write payload_{sha256[:12]}.dex\n    deactivate Host",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/sec-02-architecting-frida-instrumentation-for-i.png"
+  },
+  {
+    "slot_id": "sec-03-reconstructing-defanged-dex-files-via-da",
+    "is_cover": false,
+    "heading": "Reconstructing Defanged DEX Files via Dalvik Bytecode Manipulation",
+    "core_technical_idea": "The data flow and programmatic sequence of repairing a defanged DEX header by overwriting magic bytes, calculating SHA-1 signatures, and re-indexing Adler-32 checksums for static analysis ingestion.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Corrupted memory dump input",
+      "Magic header fix (dex\\n035\\0)",
+      "File size normalization at 0x20",
+      "SHA-1 signature calculation from 0x20 to EOF",
+      "Adler-32 checksum calculation from 0x0C to EOF",
+      "Repaired static analysis ready DEX output"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A clean top-to-bottom flowchart depicting the sequential mutation and validation of the DEX byte array offset ranges.",
+    "alt_text": "Flowchart showing the step-by-step reconstruction of a corrupted DEX header, from raw memory dump input through magic byte replacement, size stamping, SHA-1 signing, and Adler-32 checksum patching.",
+    "caption": "Sequential byte-patching pipeline transforming a defanged memory dump into a parser-compatible DEX structure.",
+    "mermaid_code": "flowchart TD\n    A[Raw Memory Dump\nInput File] -->|Read bytearray| B{Size Check\nlen >= 0x70?}\n    B -->|No| C[Abort: Too Small]\n    B -->|Yes| D[Force Magic Header\n'dex\\n035\\0' at 0x00]\n    D --> E[Stamp Actual File Size\nat 0x20]\n    E --> F[Compute SHA-1 Signature\nRange: 0x20 to EOF]\n    F --> G[Write Signature\nat 0x0C - 0x1F]\n    G --> H[Compute Adler-32 Checksum\nRange: 0x0C to EOF]\n    H --> I[Write Checksum\nat 0x08 - 0x0B]\n    I --> J[Repaired DEX\nReady for jadx / Static Analysis]\n",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 7,
+      "brand_consistency": 7,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/sec-03-reconstructing-defanged-dex-files-via-da.png"
+  },
+  {
+    "slot_id": "sec-04-failure-mode-analysis-of-memory-dumps-an",
+    "is_cover": false,
+    "heading": "Failure-Mode Analysis of Memory Dumps and Timing Attacks",
+    "core_technical_idea": "Multi-threaded race conditions and GC collisions during dynamic instrumentation cause crashes unless memory operations are offloaded asynchronously.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Native worker threads invoking defineClass simultaneously",
+      "ART Garbage Collection memory sweep collision",
+      "Unmitigated path leading to SIGSEGV crash",
+      "Mitigated path using Memory.dup() and an async queue"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Two-path comparison flowchart: Left path shows target thread contention colliding with synchronous Frida callbacks and ART GC sweeps leading to SIGSEGV; Right path shows fast native heap copying via Memory.dup() feeding an async queue to maintain thread stability.",
+    "alt_text": "Flowchart comparing unmitigated multi-threaded instrumentation failure modes against the Memory.dup asynchronous queue mitigation strategy.",
+    "caption": "Synchronous memory logging creates lock contention and GC races; offloading buffer allocation via Memory.dup() prevents SIGSEGV crashes.",
+    "mermaid_code": "flowchart TD\n    subgraph Target [Target Process Execution]\n        T1[Worker Thread A: defineClass]\n        T2[Worker Thread B: defineClass]\n        GC[ART Garbage Collector]\n    end\n\n    subgraph Unmitigated [Unmitigated Hook: Failure Path]\n        SyncHook[Synchronous JS Callback]\n        Collision[Buffer Overwrite / GC Sweep]\n        Crash[SIGSEGV Crash / Truncated Dump]\n    end\n\n    subgraph Mitigated [Mitigated Hook: Safe Path]\n        Dup[Memory.dup Heap Buffer]\n        AsyncQ[Internal Async Queue]\n        Disk[Non-Blocking Disk Write]\n    end\n\n    T1 & T2 --> SyncHook\n    GC --> SyncHook\n    SyncHook --> Collision --> Crash\n\n    T1 & T2 -.-> Dup\n    Dup --> AsyncQ --> Disk",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/sec-04-failure-mode-analysis-of-memory-dumps-an.png"
+  },
+  {
+    "slot_id": "sec-05-automating-production-threat-hunting-pip",
+    "is_cover": false,
+    "heading": "Automating Production Threat Hunting Pipelines with Extracted Artifacts",
+    "core_technical_idea": "Automated end-to-end ingestion pipeline that converts corrupted or obfuscated in-memory DEX dumps into actionable threat intelligence, signature rules, and build-time security enforcement.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Raw payload capture via Frida",
+      "Header repair script (repair_dex.py)",
+      "Parallel automated triage branches: Headless Static Analysis, YARA Rule Generation, and CI/CD Security Gates",
+      "Downstream outputs: extracted IOCs, network YARA rules, build pass/fail gates"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Horizontal multi-stage pipeline flowing left-to-right from dynamic memory capture to header repair, splitting into three distinct triage channels, and consolidating into actionable outputs.",
+    "alt_text": "Flowchart diagram illustrating an automated production threat hunting pipeline for mobile AppSec. Raw payload bytes captured from memory pass through a repair script to yield a validated DEX binary, which then feeds into Headless Analysis, YARA Rule Generation, and CI/CD Security Gates.",
+    "caption": "Automated ingestion pipeline transforming dynamic memory dumps into static IOCs, YARA signatures, and dynamic build policy checks.",
+    "mermaid_code": "flowchart LR\n    subgraph Ingestion [1. Memory Capture & Repair]\n        A[In-Memory Payload] -->|Frida Harness| B[Corrupted / Obfuscated Bytes]\n        B -->|repair_dex.py| C[Repaired .dex Binary]\n    end\n\n    subgraph Triage [2. Automated Triage Engine]\n        C --> D[Headless Static Analyzer\n(MobSF API / Ghidra)]\n        C --> E[YARA Generator\n(Byte Signatures & Strings)]\n        C --> F[CI/CD Security Gate\n(Dynamic Hooks)]\n    end\n\n    subgraph Action [3. Downstream Enforcement]\n        D --> G[Extracted URLs, APIs & Keys]\n        E --> H[Network-Wide Threat Hunting Rules]\n        F --> I[SDK Class Loading Pass/Fail Gate]\n    end",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 0,
+      "technical_fidelity": 0,
+      "aesthetic_quality": 0,
+      "brand_consistency": 0,
+      "artifacts": 0
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/sec-05-automating-production-threat-hunting-pip.png"
+  },
+  {
+    "slot_id": "sec-06-closing-insight",
+    "is_cover": false,
+    "heading": "Closing Insight",
+    "core_technical_idea": "Shift from static disk analysis to runtime boundary interception to bypass obfuscation and native packers.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Disk Artifacts vs Runtime State",
+      "Runtime Reflection & Memory-Resident Class Loading",
+      "VM Instantiation Boundary Interception",
+      "Obfuscation rendered irrelevant"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A left-to-right flowchart contrasting obsolete static disk analysis with effective runtime boundary interception at VM instantiation.",
+    "alt_text": "Technical diagram contrasting obsolete static disk analysis with modern runtime state manipulation and bytecode interception at the VM boundary.",
+    "caption": "Shifting analysis from static disk artifacts to runtime VM boundaries neutralizes native packing and obfuscation.",
+    "mermaid_code": "flowchart TD\n    A[Modern Mobile Malware] --> B{Analysis Paradigm}\n    B -->|Obsolete| C[Static Disk Analysis]\n    C --> D[Blocked by Native Packers & Obfuscation]\n    B -->|Effective| E[Runtime State Manipulation]\n    E --> F[Memory-Resident Class Loading & Reflection]\n    F --> G[Bytecode Interception at VM Boundary]\n    G --> H[Obfuscation Rendered Irrelevant]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-25/sec-06-closing-insight.png"
+  }
+]
