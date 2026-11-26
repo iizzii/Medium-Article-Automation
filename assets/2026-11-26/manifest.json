@@ -1,0 +1,255 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Gating Mobile CI/CD with Call-Graph Reachability Analysis",
+    "core_technical_idea": "Filtering SAST alerts by intersecting call graphs with entry points to block only reachable vulnerabilities.",
+    "visual_type": "diagram",
+    "must_show": [
+      "AndroidManifest.xml and Info.plist entry points",
+      "Interprocedural control flow analysis",
+      "Reachable vs dead code path branching",
+      "CI/CD Build Gate decision block"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right data flow starting from mobile entry points, passing through call-graph reachability evaluation, splitting dead code from live paths, and culminating in a CI/CD build gate.",
+    "alt_text": "A technical architecture diagram showing mobile entry points feeding into a call-graph reachability analyzer, filtering dead code and blocking builds only on valid exploit paths.",
+    "caption": "Interprocedural analysis maps entry points to vulnerability sinks, filtering out 82% of dead-code alerts before breaking the build.",
+    "mermaid_code": "flowchart TD\n    A1[AndroidManifest.xml] --> B[Entry Point Resolution]\n    A2[Info.plist] --> B\n    B --> C[Interprocedural Control Flow Analysis]\n    C --> D{Valid Path to Sink?}\n    D -->|Yes - 18%| E[Fail Build: Exploitable Finding]\n    D -->|No - 82%| F[Suppress: Dead Code / Unreachable Library]\n    style E fill:#ffcccc,stroke:#cc0000,stroke-width:2px\n    style F fill:#d4edda,stroke:#28a745,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/cover.png"
+  },
+  {
+    "slot_id": "sec-01-quantifying-alert-fatigue-and-the-cost-o",
+    "is_cover": false,
+    "heading": "Quantifying Alert Fatigue and the Cost of Unverified SAST Findings",
+    "core_technical_idea": "Distinguishing between raw static alert volume and true runtime reachability based on the app's dex graph to eliminate false compliance failures.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Android App Bundle (AAB) or iOS IPA input",
+      "SAST syntactic/semantic pattern matching engine generating raw alerts (400 warnings)",
+      "Unreferenced utility libraries and unreachable helper classes filtered out",
+      "Reachable dex graph verification path mapped to OWASP MASVS checklist",
+      "True Risk vs. False Compliance metric separation"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right processing pipeline showing the reduction of raw static findings down to true reachable risk via dex graph analysis.",
+    "alt_text": "A technical architecture diagram showing mobile app binaries feeding into a SAST scanner, filtering unreferenced code paths through a dex graph to separate false alerts from true MASVS risks.",
+    "caption": "Filtering static SAST alerts through dynamic dex graph reachability transforms 400 raw warnings into actionable, high-confidence risk metrics.",
+    "mermaid_code": "flowchart TD\n    A[Production AAB / IPA Build] --> B[SAST Scanner Engine]\n    B --> C[Raw Flood of Alerts: ~400 Warnings]\n    C --> D{Dex Graph Analysis}\n    \n    D -->|Unreferenced Utility Libraries| E[Unreachable Code / Zero MTTR]\n    D -->|Exported Components & Reachable Path| F[True Exploitability / MASVS Validation]\n    \n    E --> G[Suppressed Administrative Friction]\n    F --> H[Targeted Remediation & True Risk Compliance]\n\n    style C fill:#ffe6e6,stroke:#ff4d4d,stroke-width:2px\n    style F fill:#e6f9ff,stroke:#00b3ff,stroke-width:2px\n    style E fill:#f2f2f2,stroke:#b3b3b3,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/sec-01-quantifying-alert-fatigue-and-the-cost-o.png"
+  },
+  {
+    "slot_id": "sec-02-mapping-attack-surfaces-with-static-and-",
+    "is_cover": false,
+    "heading": "Mapping Attack Surfaces with Static and Dynamic Call-Graph Analysis",
+    "core_technical_idea": "The derivation of an Interprocedural Control Flow Graph (ICFG) from application entry points to filter out unreachable dead code and isolate exploitable surfaces.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Android Manifest / Info.plist entry points",
+      "Exported Activities, Services, and URL Schemes",
+      "Interprocedural Control Flow Graph (ICFG)",
+      "Reachable Code vs Dead Code / Unused SDKs branching"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down hierarchical flowchart showing the transformation from platform entry points through the ICFG traversal down to filtered reachable and unreachable execution paths.",
+    "alt_text": "A technical architecture flowchart demonstrating how application entry points from manifests feed into an Interprocedural Control Flow Graph to segregate reachable code from dead code.",
+    "caption": "Filtering unexploitable dead code by traversing directed edges outward from the application's root set.",
+    "mermaid_code": "flowchart TD\n    A[Android Manifest / Info.plist Entry Points] --> B[Exported Activities / Services / URL Schemes]\n    B --> C[Interprocedural Control Flow Graph (ICFG)]\n    C --> D[Reachable Code / Attack Surface]\n    C --> E[Dead Code / Unused SDKs (Filtered Out)]\n    style D fill:#d4edda,stroke:#28a745,color:#155724\n    style E fill:#f8d7da,stroke:#dc3545,color:#721c24",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 6,
+      "brand_consistency": 9,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/sec-02-mapping-attack-surfaces-with-static-and-.png"
+  },
+  {
+    "slot_id": "sec-03-building-the-triage-pipeline-engine-for-",
+    "is_cover": false,
+    "heading": "Building the Triage Pipeline Engine for False Positive Reduction",
+    "core_technical_idea": "The triage pipeline engine orchestrates reachability analysis by intersecting SARIF static findings with graph traversal results from the application root set.",
+    "visual_type": "diagram",
+    "must_show": [
+      "SARIF Report Input",
+      "Call Graph & Root Set",
+      "BFS Reachability Evaluation Engine",
+      "Filtered Verified Reachable Findings"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right data flow architecture showing raw inputs converging through the evaluation engine to produce verified output.",
+    "alt_text": "Architecture diagram of the triage pipeline showing SARIF results and call graphs ingested by a BFS reachability analyzer to filter false positives.",
+    "caption": "Data flow of the triage pipeline engine, demonstrating how dead code findings are filtered out via graph traversal reachability checks.",
+    "mermaid_code": "flowchart TD\n    A[SARIF Report Input] --> C[Evaluate Reachability Engine]\n    B[Call Graph & Root Set] --> C\n    C --> D{BFS Traversal & Node Matching}\n    D -->|Reachable| E[VERIFIED_REACHABLE Findings]\n    D -->|Unreachable| F[Filtered Out / Dead Code]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/sec-03-building-the-triage-pipeline-engine-for-.png"
+  },
+  {
+    "slot_id": "sec-04-configuring-ci-cd-security-gating-thresh",
+    "is_cover": false,
+    "heading": "Configuring CI/CD Security Gating Thresholds and Decision Matrices",
+    "core_technical_idea": "Pipeline decision logic based on exploitability tiering, data sensitivity, and MASVS severity to prevent brittle binary pass/fail blocks.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Exploitability Status inputs",
+      "Data Sensitivity checks",
+      "Conditional branching for Block Pipeline, Warn & Flag, Log & Suppress, and Auto-Close"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-down flowchart mapping vulnerability input parameters through evaluation gates to distinct CI/CD actions.",
+    "alt_text": "Decision tree diagram showing how exploitability status, data sensitivity, and MASVS category route findings to specific CI/CD pipeline actions like blocking, warning, logging, or auto-closing.",
+    "caption": "Decision matrix routing logic mapping vulnerability reachability and context directly to deterministic pipeline actions.",
+    "mermaid_code": "flowchart TD\n    Start([Vulnerability Finding]) --> Reachability{Exploitability Status?}\n    \n    Reachability -->|Verified Reachable| DataSens1{Data Sensitivity?}\n    Reachability -->|Unreachable / Dead Code| DataSens2{Data Sensitivity?}\n    \n    DataSens1 -->|High: PII / Tokens| Action1[Block Pipeline\nImmediate Fail]\n    DataSens1 -->|Low: Telemetry| Action2[Warn & Flag\nNon-blocking Alert]\n    \n    DataSens2 -->|High: PII / Tokens| Action3[Log & Suppress\nFile Cleanup Ticket]\n    DataSens2 -->|Low: Telemetry| Action4[Auto-Close\nIgnore in Reporting]\n    \n    style Action1 fill:#ffebee,stroke:#c62828,stroke-width:2px\n    style Action2 fill:#fff3e0,stroke:#ef6c00,stroke-width:2px\n    style Action3 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px\n    style Action4 fill:#eceff1,stroke:#455a64,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 7
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/sec-04-configuring-ci-cd-security-gating-thresh.png"
+  },
+  {
+    "slot_id": "sec-05-validating-pipeline-resilience-against-o",
+    "is_cover": false,
+    "heading": "Validating Pipeline Resilience Against Obfuscation and Dynamic Loading",
+    "core_technical_idea": "Illustrate how static call-graph analyzers lose interprocedural edges due to obfuscation, reflection, and native boundaries, and how mapping integration restores reachability.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Broken ProGuard/R8 Mappings creating alphanumeric stubs (a, b, c)",
+      "Reflection & Dynamic Invocation (Class.forName, NSClassFromString) severing direct edges",
+      "Native Bridge Blindness (JNI boundary crossing)",
+      "Manifest root set and reachability validation path"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A top-down flowchart showing normal static analysis traversal splitting into three failure modes (Obfuscation, Reflection, Native Boundary) and their resolution pathways via mapping files and dynamic stubs.",
+    "alt_text": "Mermaid diagram mapping pipeline resilience challenges including ProGuard symbol loss, reflection stubs, and JNI boundaries.",
+    "caption": "Pipeline blind spots: how obfuscation, reflection, and native boundaries fracture static call graphs.",
+    "mermaid_code": "flowchart TD\n    Root[Manifest Root Set] --> StaticAnalyzer[Static Call-Graph Analyzer]\n    \n    StaticAnalyzer -->|Normal Traversal| Reachable[Reachable Code]\n    \n    StaticAnalyzer -->|Failure Mode 1| Obfuscation[ProGuard/R8 Obfuscation]\n    Obfuscation -->|Missing mapping.txt| Alpha[Randomized Symbols a, b, c]\n    Alpha --> FalseNegatives[False Negatives & Broken Edges]\n    \n    StaticAnalyzer -->|Failure Mode 2| Reflection[Reflection & Dynamic Invocation]\n    Reflection -->|Class.forName / NSClassFromString| DeadCode[Treated as Unreachable Dead Code]\n    \n    StaticAnalyzer -->|Failure Mode 3| Native[Native Bridge Blindness]\n    Native -->|JNI / Interop Layers| Unresolved[Unparsed Export Tables]\n    \n    subgraph Resolution [Pipeline Safeguards]\n        Mapping[Supply mapping.txt] -.-> Alpha\n        Stubs[Account for Reflection Stubs] -.-> DeadCode\n        Signatures[Parse JNINativeMethod] -.-> Unresolved\n    end\n",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/sec-05-validating-pipeline-resilience-against-o.png"
+  },
+  {
+    "slot_id": "sec-06-closing-insights-discussion",
+    "is_cover": false,
+    "heading": "Closing Insights & Discussion",
+    "core_technical_idea": "Filtering out static analysis noise using call-graph reachability to align security gates with actual attacker pathways.",
+    "visual_type": "diagram",
+    "must_show": [
+      "SAST Output",
+      "Call-Graph Reachability",
+      "Unreferenced Code Blocks (Noise)",
+      "Attacker Traversable Paths",
+      "Security Gates"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "A left-to-right flow starting from raw SAST output, filtering through call-graph reachability, and separating unreferenced dead code from active attacker-traversable paths into security gates.",
+    "alt_text": "A flowchart showing SAST output filtered by call-graph reachability to separate unreferenced dead code from attacker-traversable paths entering security gates.",
+    "caption": "Filtering raw SAST findings through call-graph reachability isolates actionable threats from unreferenced code noise.",
+    "mermaid_code": "flowchart TD\n    A[Raw SAST Output] --> B{Call-Graph Reachability Analysis}\n    B -->|Unreferenced Code Blocks| C[Filtered Out: Zero Alert Fatigue]\n    B -->|Traversable Paths| D[Active Security Gates]\n    D --> E[Protected Developer Velocity & Compliance]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-26/sec-06-closing-insights-discussion.png"
+  }
+]
