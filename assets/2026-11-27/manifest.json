@@ -1,0 +1,301 @@
+[
+  {
+    "slot_id": "cover",
+    "is_cover": true,
+    "heading": "Auditing iOS Universal Links and Custom URL Schemes",
+    "core_technical_idea": "Attack path showing how insecure custom URL schemes and misconfigured AASA wildcards force WKWebView to leak OAuth tokens.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Safari Link Click",
+      "bankco:// Custom URL Scheme Handler",
+      "Apple Application Site Association (AASA) Wildcard (*)",
+      "WKWebView External Origin Loading",
+      "OAuth Access Token Exfiltration"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right data flow showing the sequence from untrusted browser trigger through vulnerable iOS handlers to token exfiltration.",
+    "alt_text": "Mermaid sequence and architecture diagram detailing the vulnerability path from Safari link click to OAuth token leakage via WKWebView.",
+    "caption": "Attack vector mapping: how unvalidated deep links and wildcard AASA entries bypass domain validation to trigger session hijacking.",
+    "mermaid_code": "sequenceDiagram\n    autonumber\n    actor Attacker\n    participant Safari\n    participant iOS as iOS OS / AASA\n    participant BankCo as BankCo iOS App\n    participant WebView as WKWebView\n\n    Attacker->>Safari: Send Malicious Deep Link (bankco:// or Universal Link)\n    Safari->>iOS: Evaluate Domain & Scheme\n    Note over iOS,BankCo: AASA Wildcard (*) bypasses strict matching\n    iOS->>BankCo: application:openURL:options:\n    BankCo->>WebView: WKWebView.load(URLRequest) with unsanitized parameters\n    WebView->>Attacker: Load External Origin & Exfiltrate OAuth Tokens via Fragment Reflection",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 7,
+      "aesthetic_quality": 6,
+      "brand_consistency": 7,
+      "artifacts": 6
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/cover.png"
+  },
+  {
+    "slot_id": "sec-01-illustrative-case-study-parameters-and-i",
+    "is_cover": false,
+    "heading": "Illustrative Case Study Parameters and Incident Telemetry",
+    "core_technical_idea": "Comparison of legacy custom URL schemes vs. Universal Links security parameters and remediation standards across origin verification, path parsing, and token handling.",
+    "visual_type": "table_card",
+    "must_show": [
+      "Legacy Implementation bankco://",
+      "Universal Link Implementation https://bankco.com/",
+      "Target Remediation Standard",
+      "Origin Verification",
+      "Path Parsing Logic",
+      "Token Handling",
+      "WebView Injection Risk",
+      "Telemetry Spike"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Structured comparison table highlighting metrics, vulnerabilities in current states, and remediation goals.",
+    "alt_text": "Detailed comparison table contrasting legacy custom URL schemes against Universal Links across origin verification, path parsing, token handling, WebView injection risk, and telemetry metrics.",
+    "caption": "Operational security parameters contrasting legacy custom schemes with modern Universal Links and target remediations.",
+    "mermaid_code": "",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": {
+      "headers": [
+        "Operational Metric / Vector",
+        "Legacy Implementation (bankco://)",
+        "Universal Link Implementation (https://bankco.com/)",
+        "Target Remediation Standard"
+      ],
+      "rows": [
+        [
+          "Origin Verification",
+          "None (OS-level registration conflict risk)",
+          "Cryptographic via AASA domain verification",
+          "Strict Associated Domains Entitlement"
+        ],
+        [
+          "Path Parsing Logic",
+          "Native String Concatenation",
+          "Regex pattern match against NSURLComponents",
+          "Strict Allowlist Schema Parser (URLComponents)"
+        ],
+        [
+          "Token Handling",
+          "Query Parameter (?token=xyz)",
+          "Encrypted Payload in URL Fragment (#payload=...)",
+          "Ephemeral Auth Code Exchange via PKCE"
+        ],
+        [
+          "WebView Injection Risk",
+          "High (WKWebView.load without domain checks)",
+          "Medium (Mitigated by domain match)",
+          "Restricted Navigation Delegate Allowlist"
+        ],
+        [
+          "Telemetry Spike (Fictional)",
+          "14,200 invalid scheme invocations/day",
+          "320 path normalization bypasses/day",
+          "0 unvalidated invocations permitted"
+        ]
+      ]
+    },
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 6,
+      "aesthetic_quality": 6,
+      "brand_consistency": 8,
+      "artifacts": 4
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/sec-01-illustrative-case-study-parameters-and-i.png"
+  },
+  {
+    "slot_id": "sec-02-exposing-intent-hijacking-risks-in-custo",
+    "is_cover": false,
+    "heading": "Exposing Intent Hijacking Risks in Custom URL Schemes",
+    "core_technical_idea": "Race condition and ambiguous resolution when multiple apps register the same custom URL scheme, leading to attacker payload execution via naive string parsing.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Safari / App invocation",
+      "Ambiguous OS routing to multiple registered apps",
+      "Malicious App vs Legitimate App",
+      "Legacy AppDelegate manual string splitting",
+      "Unmonitored WKWebView exposure"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Left-to-right flow starting from URI invocation through ambiguous OS resolution, branching into malicious vs legitimate targets, and culminating in the vulnerable parser logic.",
+    "alt_text": "Architectural diagram showing iOS custom URL scheme invocation resolving ambiguously to competing apps, followed by legacy AppDelegate string splitting passing malicious URLs to a WKWebView.",
+    "caption": "iOS lacks deterministic routing for duplicate custom schemes, enabling malicious apps to intercept callbacks and inject payloads via naive string parsing.",
+    "mermaid_code": "flowchart LR\n    subgraph iOS_Invocation [Invocation Source]\n        A[Safari / App] -->|bankco://auth/success?target=...| B(iOS OS Router)\n    end\n\n    subgraph Scheme_Conflict [Non-Deterministic Routing]\n        B -.->|No Exclusivity Guarantee| C[Legitimate App]\n        B -.->|Intent Hijacking| D[Malicious App]\n    end\n\n    subgraph Vulnerable_Flow [Legacy Handler]\n        D -->|Payload Injection| E[AppDelegate application:openURL:]\n        E -->|componentsSeparatedByString:| F[Extracted Attacker URL]\n        F -->|WKWebView Load| G[Compromised Internal WebView]\n    end\n\n    style D fill:#ffdddd,stroke:#ff0000,stroke-width:2px\n    style G fill:#ffdddd,stroke:#ff0000,stroke-width:2px\n    style C fill:#ddffdd,stroke:#00aa00,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/sec-02-exposing-intent-hijacking-risks-in-custo.png"
+  },
+  {
+    "slot_id": "sec-03-auditing-apple-application-site-associat",
+    "is_cover": false,
+    "heading": "Auditing Apple Application Site Association Routing Constraints",
+    "core_technical_idea": "Demonstrate the Universal Link handling flow where a malformed AASA path and path traversal tricks bypass OS-level checks and cause normalization discrepancies in the internal app router.",
+    "visual_type": "diagram",
+    "must_show": [
+      "URL input with traversal payload",
+      "iOS Universal Link Handler matching /auth/*",
+      "Internal App Router path normalization discrepancy",
+      "Unintended execution scope"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Linear sequence flowchart from top to bottom showing how an incoming crafted URL passes from the OS handler through routing evaluation into internal application modules.",
+    "alt_text": "Flowchart illustrating how a malformed URL bypasses AASA path constraints due to path normalization discrepancies between iOS and the internal app router.",
+    "caption": "Path normalization discrepancies allow crafted traversal sequences to escape intended AASA routing scopes after handover to the app.",
+    "mermaid_code": "flowchart TD\n    A[\"URL: https://bankco.com/auth/..%2f..%2fsteal\"] --> B[\"iOS Universal Link Handler\"]\n    B -->|\"Matches /auth/* constraint\"| C[\"Handover to iOS Application\"]\n    C --> D{\"Internal Router Normalization\"}\n    D -->|\"Normalizes path post-parsing\"| E[\"Execution shifts to restricted module /steal\"]\n    style A fill:#f9f,stroke:#333,stroke-width:2px\n    style E fill:#ff9999,stroke:#333,stroke-width:2px",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 8,
+      "aesthetic_quality": 7,
+      "brand_consistency": 6,
+      "artifacts": 9
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/sec-03-auditing-apple-application-site-associat.png"
+  },
+  {
+    "slot_id": "sec-04-uncovering-webview-token-leakage-via-fri",
+    "is_cover": false,
+    "heading": "Uncovering WebView Token Leakage via Frida Runtime Hooking",
+    "core_technical_idea": "The deep link auditing policy evaluation pipeline that flags unauthorized schemes, untrusted hosts, path traversal, and exposed tokens in query parameters.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Raw deep link URL input",
+      "Scheme Validation step",
+      "Host & Universal Link Validation step",
+      "Path Traversal & Query Token checks",
+      "SecurityAuditResult output with risk score"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom flowchart detailing the sequential validation checks executed by the Python security harness on raw deep link payloads.",
+    "alt_text": "Flowchart of the Deep Link Auditor policy pipeline showing sequential validation checks for scheme, host, path traversal, and query tokens.",
+    "caption": "Deterministic validation flow of the security harness processing raw telemetry to calculate risk scores.",
+    "mermaid_code": "flowchart TD\n    A[Raw Deep Link URL] --> B{Scheme Validation}\n    B -- Disallowed Scheme --> C[Add Finding: Risk +40]\n    B -- Allowed Scheme --> D{Universal Link Host Check}\n    C --> D\n    D -- Untrusted Host --> E[Add Finding: Risk +50]\n    D -- Trusted Host --> F{Path Traversal Check}\n    E --> F\n    F -- '..' or '%2e%2e' --> G[Add Finding: Risk +30]\n    F -- Clean Path --> H{Query Parameter Token & Redirect Check}\n    G --> H\n    H -- Sensitive Token / Open Redirect --> I[Add Finding: Risk +25/+35]\n    H -- Clean Query --> J[Compute Final Risk Score & Is_Valid]\n    I --> J\n    J --> K[SecurityAuditResult Object]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 10,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/sec-04-uncovering-webview-token-leakage-via-fri.png"
+  },
+  {
+    "slot_id": "sec-05-implementing-strict-deep-link-validation",
+    "is_cover": false,
+    "heading": "Implementing Strict Deep Link Validation and Schema Enforcement",
+    "core_technical_idea": "Step-by-step cryptographic and structural validation pipeline for incoming deep link requests to prevent tampering and unauthorized execution.",
+    "visual_type": "diagram",
+    "must_show": [
+      "Host domain allowlist check",
+      "Data and signature extraction",
+      "HMAC-SHA256 signature verification",
+      "JSON payload deserialization",
+      "Timestamp expiration check (max_age_seconds)"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Top-to-bottom pipeline showing the 5 sequential validation gates a deep link must pass before route authorization.",
+    "alt_text": "Flowchart detailing the five-step deep link validation pipeline from host checking to expiration bounds.",
+    "caption": "Defensive parsing sequence enforcing domain integrity, cryptographic signatures, and temporal validity.",
+    "mermaid_code": "flowchart TD\n    A[Incoming Raw URL] --> B{1. Host Domain in Allowed List?}\n    B -- No --> E[Raise DeepLinkValidationError]\n    B -- Yes --> C{2. Extract data & sig params?}\n    C -- No --> E\n    C -- Yes --> D{3. Verify HMAC-SHA256 Signature?}\n    D -- No --> E\n    D -- Yes --> F{4. Deserialize JSON Payload?}\n    F -- Fail --> E\n    F -- Success --> G{5. Check Timestamp Expiration?}\n    G -- Expired --> E\n    G -- Valid --> H[Return ValidatedRoute]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 10,
+      "technical_fidelity": 10,
+      "aesthetic_quality": 9,
+      "brand_consistency": 9,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/sec-05-implementing-strict-deep-link-validation.png"
+  },
+  {
+    "slot_id": "sec-06-balancing-user-onboarding-friction-with-",
+    "is_cover": false,
+    "heading": "Balancing User Onboarding Friction with Enterprise Security Posture",
+    "core_technical_idea": "Continuous CI/CD pipeline checks for AASA assets and binary static scanning to prevent deep link regression vulnerabilities.",
+    "visual_type": "diagram",
+    "must_show": [
+      "AASA Asset Verification",
+      "Binary Static Scanning",
+      "Telemetry Monitoring",
+      "AppSec Pipeline integration"
+    ],
+    "must_avoid": [
+      "generic padlocks",
+      "hooded hackers",
+      "binary rain",
+      "random circuit boards"
+    ],
+    "metaphor": "",
+    "composition": "Linear pipeline flow from build deployment through automated static analysis checks to SIEM telemetry monitoring.",
+    "alt_text": "A flowchart showing automated continuous integration checks including AASA asset verification, binary static scanning for deprecated selectors, and SIEM telemetry monitoring for unknown scheme invocations.",
+    "caption": "Integrating automated AppSec checks into the CI/CD pipeline to preempt deep link vulnerabilities before deployment.",
+    "mermaid_code": "flowchart TD\n    A[Build Deployment] --> B[1. AASA Asset Verification]\n    A --> C[2. Binary Static Scanning]\n    A --> D[3. Telemetry Monitoring]\n    \n    B -->|Test HTTP 200 & JSON Syntax| E[Pass / Fail Gate]\n    C -->|Scan Mach-O for Deprecated Selectors| E\n    D -->|Stream Unknown Schemes to SIEM| F[SOC Telemetry Alert]\n    \n    E -->|Valid| G[Secure Release]\n    E -->|Invalid| H[Build Failure]",
+    "chart_spec": null,
+    "code_snippet": "",
+    "table_data": null,
+    "image_prompt": "",
+    "critic_scores": {
+      "heading_relevance": 9,
+      "technical_fidelity": 9,
+      "aesthetic_quality": 8,
+      "brand_consistency": 8,
+      "artifacts": 10
+    },
+    "final_path": "/home/runner/work/Medium-Article-Automation/Medium-Article-Automation/assets/2026-11-27/sec-06-balancing-user-onboarding-friction-with-.png"
+  }
+]
